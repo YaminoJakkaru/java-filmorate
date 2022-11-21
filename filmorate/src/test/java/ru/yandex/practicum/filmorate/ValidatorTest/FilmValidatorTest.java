@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.ValidatorTest;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
-
 import java.time.LocalDate;
 
 public class FilmValidatorTest {
