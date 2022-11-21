@@ -15,8 +15,8 @@ import java.util.Map;
 public class FilmController {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final Map<Integer, Film> films = new HashMap<>();
-    FilmValidator filmValidator= new FilmValidator();
-    Id id=new Id();
+    FilmValidator filmValidator = new FilmValidator();
+    Id id = new Id();
 
     @GetMapping("/films")
     public ArrayList<Film> users() {
@@ -25,7 +25,7 @@ public class FilmController {
 
     @PostMapping("/films")
     public Film create(@RequestBody @NotNull Film film) {
-        if(filmValidator.validate(film)) {
+        if (filmValidator.validate(film)) {
             film.setId(id.getNewId());
             films.put(film.getId(), film);
             log.info("Добавлен фильм");
@@ -37,14 +37,14 @@ public class FilmController {
 
     @PutMapping("/films")
     public Film change(@RequestBody @NotNull Film film) {
-        if(filmValidator.validate(film)) {
-            if(!films.containsKey(film.getId())){
+        if (filmValidator.validate(film)) {
+            if (!films.containsKey(film.getId())) {
                 log.warn("Попытка изменить несуществующий фильм");
                 throw new NullPointerException();
             }
-        films.put(film.getId(), film);
+            films.put(film.getId(), film);
             log.info("Фильм изменен");
-        return film;
+            return film;
         }
         log.warn("Валидация фильма не пройдена");
         throw new ValidationException();
