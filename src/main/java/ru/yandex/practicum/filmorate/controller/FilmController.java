@@ -17,11 +17,11 @@ import java.util.Map;
 public class FilmController {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final Map<Integer, Film> films = new HashMap<>();
-    FilmValidator filmValidator = new FilmValidator();
-    Id id = new Id();
+    private final FilmValidator filmValidator = new FilmValidator();
+    private final Id id = new Id();
 
     @GetMapping("/films")
-    public ArrayList<Film> users() {
+    public ArrayList<Film> films() {
         return new ArrayList<>(films.values());
     }
 

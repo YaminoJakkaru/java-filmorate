@@ -7,20 +7,20 @@ import java.time.LocalDate;
 public class UserValidator {
 
 
-    public boolean validate(User user){
-        return emailValidate(user.getEmail())&&
-                birthDateValidate(user.getBirthday())&&loginValidate(user.getLogin());
+    public boolean validate(User user) {
+        return emailValidate(user.getEmail()) &&
+                birthDateValidate(user.getBirthday()) && loginValidate(user.getLogin());
     }
 
-    public  boolean emailValidate(String email){
-        return email.contains("@");
+    public boolean emailValidate(String email) {
+        return email != null && email.contains("@");
     }
 
-    public  boolean birthDateValidate(LocalDate birthday){
-        return birthday.isBefore(LocalDate.now());
+    public boolean birthDateValidate(LocalDate birthday) {
+        return birthday != null && birthday.isBefore(LocalDate.now());
     }
 
-    public boolean loginValidate(String login){
-        return !login.isBlank()&&!login.contains(" ");
+    public boolean loginValidate(String login) {
+        return login != null && !login.isBlank() && !login.contains(" ");
     }
 }
