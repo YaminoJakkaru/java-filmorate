@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.validator;
 
+import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 
+@Service
 public class UserValidator {
 
 

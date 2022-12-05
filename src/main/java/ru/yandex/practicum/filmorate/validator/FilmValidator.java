@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.validator;
 
+import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
 
+@Service
 public class FilmValidator {
     private static final int MAX_CHAR_IN_DESCRIPTION = 200;
     private static final LocalDate EARLIEST_DATE = LocalDate.parse("1895-12-21");
