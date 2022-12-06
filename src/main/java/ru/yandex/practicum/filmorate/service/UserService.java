@@ -14,14 +14,14 @@ import java.util.List;
 @Service
 public class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
-    UserStorage userStorage;
+    private final UserStorage userStorage;
 
     @Autowired
     public UserService(UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
-    public ArrayList<User> getFriends(int id) {
+    public List<User> getFriends(int id) {
         ArrayList<User> friends = new ArrayList<>();
         for (int friend : userStorage.getUser(id).getFriends()) {
             friends.add(userStorage.getUser(friend));
@@ -45,7 +45,7 @@ public class UserService {
         log.info("Дружба удалена");
     }
 
-    public ArrayList<User> getMutualFriends(int id, int otherId) {
+    public List<User> getMutualFriends(int id, int otherId) {
         ArrayList<User> mutualFriends = new ArrayList<>();
         for (int friend : userStorage.getUser(id).getFriends()) {
             if (userStorage.getUser(otherId).getFriends().contains(friend)) {

@@ -4,16 +4,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Id {
-    private int filmId = 0;
-    private int userId = 0;
+    private int Id = 0;
 
-    public int getNewFilmId() {
-        filmId++;
-        return filmId;
+
+    public int getNewId() {
+        Id++;
+        return Id;
     }
 
-    public int getNewUserId() {
-        userId++;
-        return userId;
-    }
+
 }

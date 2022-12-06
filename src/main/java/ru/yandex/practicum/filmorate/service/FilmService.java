@@ -17,8 +17,8 @@ import java.util.stream.Stream;
 @Service
 public class FilmService {
     private static final Logger log = LoggerFactory.getLogger(FilmService.class);
-    FilmStorage filmStorage;
-    UserStorage userStorage;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     @Autowired
     public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
@@ -44,10 +44,10 @@ public class FilmService {
         throw new UserNotFoundException();
     }
 
-    public ArrayList<Film> getTopFilms(int count) {
-        Comparator<Film> comparator = Comparator.comparingInt(o -> (int) (o.getDuration() + o.getLikes().size() * -1));
+    public List<Film> getTopFilms(int count) {
+        Comparator<Film> comparator = Comparator.comparingInt(film -> (int) (film.getDuration() + film.getLikes().size() * -1));
         TreeSet<Film> topFilms = new TreeSet<>(comparator);
         topFilms.addAll(filmStorage.getAllFilms());
-        return (ArrayList<Film>) topFilms.stream().limit(count).collect(Collectors.toList());
+        return  topFilms.stream().limit(count).collect(Collectors.toList());
     }
 }

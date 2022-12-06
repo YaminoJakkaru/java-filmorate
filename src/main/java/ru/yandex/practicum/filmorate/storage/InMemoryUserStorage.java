@@ -6,13 +6,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.Exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.id.Id;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
-import javax.validation.ValidationException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -23,14 +25,14 @@ public class InMemoryUserStorage implements UserStorage {
     private static final Logger log = LoggerFactory.getLogger(UserStorage.class);
 
     @Autowired
-    public InMemoryUserStorage(Id id, UserValidator userValidator) {
-        this.id = id;
+    public InMemoryUserStorage( UserValidator userValidator) {
+        this.id = new Id();
         this.userValidator = userValidator;
     }
 
     @Override
-    public ArrayList<User> getAllUsers() {
-        return new ArrayList<>(users.values());
+    public List<User> getAllUsers() {
+        return List.copyOf(users.values());
     }
 
     @Override
@@ -44,7 +46,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User createUser(User user) {
         if (userValidator.validate(user)) {
-            user.setId(id.getNewUserId());
+            user.setId(id.getNewId());
             if (user.getName() == null || user.getName().isBlank()) {
                 user.setName(user.getLogin());
             }
@@ -70,10 +72,4 @@ public class InMemoryUserStorage implements UserStorage {
         log.warn("Валидация пользователя не пройдена");
         throw new ValidationException();
     }
-
-    @Override
-    public void deleteUser(int id){
-        users.remove(id);
-    }
-
 }

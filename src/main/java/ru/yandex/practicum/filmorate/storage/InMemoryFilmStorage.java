@@ -6,14 +6,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.Exceptions.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.id.Id;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
-import javax.validation.ValidationException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -24,8 +24,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     private static final Logger log = LoggerFactory.getLogger(FilmStorage.class);
 
     @Autowired
-    public InMemoryFilmStorage(Id id, FilmValidator filmValidator) {
-        this.id = id;
+    public InMemoryFilmStorage( FilmValidator filmValidator) {
+        this.id = new Id();
         this.filmValidator = filmValidator;
 
     }
@@ -46,7 +46,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film createFilm(Film film) {
         if (filmValidator.validate(film)) {
-            film.setId(id.getNewFilmId());
+            film.setId(id.getNewId());
             films.put(film.getId(), film);
             log.info("Добавлен фильм");
             return film;
@@ -70,8 +70,5 @@ public class InMemoryFilmStorage implements FilmStorage {
         throw new ValidationException();
     }
 
-    @Override
-    public void deleteFilm(int id) {
-        films.remove(id);
-    }
+
 }
