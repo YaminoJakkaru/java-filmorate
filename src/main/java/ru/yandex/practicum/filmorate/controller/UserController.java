@@ -1,20 +1,23 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
 
 @RestController
 public class UserController {
-    private final InMemoryUserStorage userStorage;
+    @Qualifier("UserDbStorage")
+    private final  UserStorage userStorage;
+    @Qualifier("UserDbService")
     private final UserService userService;
 
     @Autowired
-    public UserController(InMemoryUserStorage userStorage, UserService userService) {
+    public UserController(@Qualifier("UserDbStorage")UserStorage userStorage,@Qualifier("UserDbService")UserService userService) {
         this.userStorage = userStorage;
         this.userService = userService;
     }
@@ -36,7 +39,7 @@ public class UserController {
 
     @GetMapping("/users/{id}")
     public User getUser(@PathVariable int id) {
-        return userStorage.getUser(id);
+        return userStorage.findUserById(id);
     }
 
     @PutMapping("/users/{id}/friends/{friendId}")

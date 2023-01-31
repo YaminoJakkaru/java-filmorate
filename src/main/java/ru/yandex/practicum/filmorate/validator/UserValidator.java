@@ -11,7 +11,7 @@ public class UserValidator {
 
     public boolean validate(User user) {
         return emailValidate(user.getEmail()) &&
-                birthDateValidate(user.getBirthday()) && loginValidate(user.getLogin());
+                birthDateValidate(user.getBirthday()) && loginValidate(user.getLogin())&&nameValidate(user);
     }
 
     public boolean emailValidate(String email) {
@@ -24,5 +24,11 @@ public class UserValidator {
 
     public boolean loginValidate(String login) {
         return login != null && !login.isBlank() && !login.contains(" ");
+    }
+    public boolean nameValidate(User user) {
+        if (user.getName().isBlank()){
+            user.setName(user.getLogin());
+        }
+        return true;
     }
 }

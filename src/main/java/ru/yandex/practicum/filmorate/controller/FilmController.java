@@ -1,28 +1,38 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.SupportiveDbStorage;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 public class FilmController {
-    private final InMemoryFilmStorage filmStorage;
+
+    @Qualifier("FilmDbStorage")
+    private final FilmStorage filmStorage;
+    @Qualifier("FilmDbService")
     private final FilmService filmService;
+    private final SupportiveDbStorage supportiveDbStorage;
 
     @Autowired
-    public FilmController(InMemoryFilmStorage filmStorage, FilmService filmService) {
+
+    public FilmController(@Qualifier("FilmDbStorage") FilmStorage filmStorage, @Qualifier("FilmDbService") FilmService filmService, SupportiveDbStorage supportiveDbStorage) {
+
         this.filmStorage = filmStorage;
         this.filmService = filmService;
+        this.supportiveDbStorage = supportiveDbStorage;
     }
 
     @GetMapping("/films")
-    public ArrayList<Film> films() {
+    public List<Film> getFilms() {
         return filmStorage.getAllFilms();
     }
 
@@ -38,7 +48,7 @@ public class FilmController {
 
     @GetMapping("/films/{id}")
     public Film getFilm(@PathVariable int id) {
-        return filmStorage.getFilm(id);
+        return filmStorage.findFilmById(id);
     }
 
     @PutMapping("/films/{id}/like/{userId}")
@@ -54,5 +64,25 @@ public class FilmController {
     @GetMapping("/films/popular")
     public List<Film> getTopFilms(@RequestParam(defaultValue = "10") int count) {
         return filmService.getTopFilms(count);
+    }
+
+    @GetMapping("/mpa")
+    public  List<Mpa> getAllMpa(){
+        return supportiveDbStorage.getAllMpa();
+    }
+
+    @GetMapping("/mpa/{id}")
+    public  Mpa getMpa(@PathVariable int id){
+        return supportiveDbStorage.getMpa(id);
+    }
+
+    @GetMapping("/genres")
+    public  List<Genre> getAllGenres(){
+        return supportiveDbStorage.getAllGenres();
+    }
+
+    @GetMapping("/genres/{id}")
+    public  Genre getGenre(@PathVariable int id){
+        return supportiveDbStorage.getGenre(id);
     }
 }

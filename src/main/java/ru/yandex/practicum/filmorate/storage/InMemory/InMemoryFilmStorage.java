@@ -1,14 +1,16 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.InMemory;
 
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.Exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.id.Id;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
 
@@ -17,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@Qualifier("InMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> films = new HashMap<>();
     private final Id id;
@@ -36,7 +39,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getFilm(int id) {
+    public Film findFilmById(int id) {
         if (films.containsKey(id)) {
             return films.get(id);
         }
@@ -69,6 +72,4 @@ public class InMemoryFilmStorage implements FilmStorage {
         log.warn("Валидация фильма не пройдена");
         throw new ValidationException();
     }
-
-
 }
