@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.Exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Service
 @Qualifier("InMemoryFilmService")
 public class InMemoryFilmService implements FilmService {
-    private static final Logger log = LoggerFactory.getLogger(InMemoryFilmService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(InMemoryFilmService.class);
 
     @Qualifier("InMemoryFilmStorage")
     private final FilmStorage filmStorage;
@@ -33,8 +33,8 @@ public class InMemoryFilmService implements FilmService {
 
     public void addLike(int id, int userId) {
         if (userStorage.findUserById(userId) != null) {
-            filmStorage.findFilmById(id).addLikes(userId);
-            log.info("Добавлен лайк");
+            filmStorage.findFilmById(id).addLike(userId);
+            LOG.info("Добавлен лайк");
             return;
         }
         throw new UserNotFoundException();
@@ -42,8 +42,8 @@ public class InMemoryFilmService implements FilmService {
 
     public void deleteLike(int id, int userId) {
         if (userStorage.findUserById(userId) != null) {
-            filmStorage.findFilmById(id).deleteLikes(userId);
-            log.info("Удален лайк");
+            filmStorage.findFilmById(id).deleteLike(userId);
+            LOG.info("Удален лайк");
             return;
         }
         throw new UserNotFoundException();

@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.Exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.id.Id;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -24,7 +24,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> films = new HashMap<>();
     private final Id id;
     private final FilmValidator filmValidator;
-    private static final Logger log = LoggerFactory.getLogger(FilmStorage.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FilmStorage.class);
 
     @Autowired
     public InMemoryFilmStorage( FilmValidator filmValidator) {
@@ -51,10 +51,10 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (filmValidator.validate(film)) {
             film.setId(id.getNewId());
             films.put(film.getId(), film);
-            log.info("Добавлен фильм");
+            LOG.info("Добавлен фильм");
             return film;
         }
-        log.warn("Валидация фильма не пройдена");
+        LOG.warn("Валидация фильма не пройдена");
         throw new ValidationException();
     }
 
@@ -62,14 +62,14 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film changeFilm(Film film) {
         if (filmValidator.validate(film)) {
             if (!films.containsKey(film.getId())) {
-                log.warn("Попытка изменить несуществующий фильм");
+                LOG.warn("Попытка изменить несуществующий фильм");
                 throw new NullPointerException();
             }
             films.put(film.getId(), film);
-            log.info("Фильм изменен");
+            LOG.info("Фильм изменен");
             return film;
         }
-        log.warn("Валидация фильма не пройдена");
+        LOG.warn("Валидация фильма не пройдена");
         throw new ValidationException();
     }
 }

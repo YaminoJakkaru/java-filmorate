@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.DAO.SupportiveDbStorage;
+
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 
@@ -20,15 +20,15 @@ public class FilmController {
     private final FilmStorage filmStorage;
     @Qualifier("FilmDbService")
     private final FilmService filmService;
-    private final SupportiveDbStorage supportiveDbStorage;
+
 
     @Autowired
 
-    public FilmController(@Qualifier("FilmDbStorage") FilmStorage filmStorage, @Qualifier("FilmDbService") FilmService filmService, SupportiveDbStorage supportiveDbStorage) {
+    public FilmController(@Qualifier("FilmDbStorage") FilmStorage filmStorage, @Qualifier("FilmDbService") FilmService filmService) {
 
         this.filmStorage = filmStorage;
         this.filmService = filmService;
-        this.supportiveDbStorage = supportiveDbStorage;
+
     }
 
     @GetMapping("/films")
@@ -64,25 +64,5 @@ public class FilmController {
     @GetMapping("/films/popular")
     public List<Film> getTopFilms(@RequestParam(defaultValue = "10") int count) {
         return filmService.getTopFilms(count);
-    }
-
-    @GetMapping("/mpa")
-    public  List<Mpa> getAllMpa(){
-        return supportiveDbStorage.getAllMpa();
-    }
-
-    @GetMapping("/mpa/{id}")
-    public  Mpa getMpa(@PathVariable int id){
-        return supportiveDbStorage.getMpa(id);
-    }
-
-    @GetMapping("/genres")
-    public  List<Genre> getAllGenres(){
-        return supportiveDbStorage.getAllGenres();
-    }
-
-    @GetMapping("/genres/{id}")
-    public  Genre getGenre(@PathVariable int id){
-        return supportiveDbStorage.getGenre(id);
     }
 }

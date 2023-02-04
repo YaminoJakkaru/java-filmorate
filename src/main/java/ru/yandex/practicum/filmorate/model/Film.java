@@ -21,11 +21,11 @@ public class Film {
     private final Set<Integer> likes = new HashSet<>();
 
 
-    public void addLikes(int id) {
+    public void addLike(int id) {
         likes.add(id);
     }
 
-    public void deleteLikes(int id) {
+    public void deleteLike(int id) {
         likes.remove(id);
     }
 

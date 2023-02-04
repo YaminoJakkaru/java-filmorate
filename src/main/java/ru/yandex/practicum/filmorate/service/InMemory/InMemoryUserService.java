@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.Exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -16,7 +16,7 @@ import java.util.List;
 @Service
 @Qualifier("InMemoryUserService")
 public class InMemoryUserService implements UserService {
-    private static final Logger log = LoggerFactory.getLogger(InMemoryUserService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(InMemoryUserService.class);
     @Qualifier("InMemoryUserStorage")
     private final UserStorage userStorage;
 
@@ -37,7 +37,7 @@ public class InMemoryUserService implements UserService {
         if (userStorage.findUserById(friendId) != null) {
             userStorage.findUserById(id).addFriend(friendId);
             userStorage.findUserById(friendId).addFriend(id);
-            log.info("Создана дружба");
+            LOG.info("Создана дружба");
             return;
         }
         throw new UserNotFoundException();
@@ -46,7 +46,7 @@ public class InMemoryUserService implements UserService {
     public void breakFriends(int id, int friendId) {
         userStorage.findUserById(id).deleteFriend(friendId);
         userStorage.findUserById(friendId).deleteFriend(id);
-        log.info("Дружба удалена");
+        LOG.info("Дружба удалена");
     }
 
     public List<User> getMutualFriends(int id, int otherId) {

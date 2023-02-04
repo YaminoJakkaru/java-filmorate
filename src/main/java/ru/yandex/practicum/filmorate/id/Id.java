@@ -4,12 +4,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Id {
-    private int Id = 0;
+    private int id = 0;
 
 
     public int getNewId() {
-        Id++;
-        return Id;
+        id++;
+        return id;
     }
 
 

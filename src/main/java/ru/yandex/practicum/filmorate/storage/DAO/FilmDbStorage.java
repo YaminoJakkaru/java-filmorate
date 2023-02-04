@@ -6,10 +6,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.Exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.reader.Reader;
+
+import ru.yandex.practicum.filmorate.rowMapper.FilmMapper;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
@@ -20,73 +21,66 @@ import java.util.stream.Collectors;
 @Qualifier("FilmDbStorage")
 public class FilmDbStorage implements FilmStorage {
 
-    private static final Logger log = LoggerFactory.getLogger(FilmStorage.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FilmStorage.class);
     private final FilmValidator filmValidator;
     private final JdbcTemplate jdbcTemplate;
-    private final Reader reader;
 
-    public FilmDbStorage(JdbcTemplate jdbcTemplate, FilmValidator filmValidator, Reader reader) {
+    SimpleJdbcInsert simpleJdbcInsertFilm;
+
+    public FilmDbStorage(JdbcTemplate jdbcTemplate, FilmValidator filmValidator) {
         this.jdbcTemplate = jdbcTemplate;
         this.filmValidator = filmValidator;
-        this.reader = reader;
+        simpleJdbcInsertFilm = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("film")
+                .usingGeneratedKeyColumns("film_id");
     }
 
     @Override
     public List<Film> getAllFilms() {
-        String query="select * from film";
-
-        List<Film> films = jdbcTemplate.query(query, reader::readFilm);
-        for (Film film : films) {
-            fillFilm(film);
-        }
-        return films;
+        String query = "select f.*,m.name as mpa_name, group_concat(fg.genre_id)as genres_ids"
+                + ",group_concat(g.name) as genres_names, group_concat(fl.user_id) as likes from film as f"
+                + " left join mpa as m on f.mpa_id=m.mpa_id left join film_genre as fg on f.film_id=fg.film_id"
+                + " left join genre as g on fg.genre_id=g.genre_id left join film_likes as fl on f.film_id=fl.film_id"
+                + " group by f.film_id ";
+        return jdbcTemplate.query(query, new FilmMapper());
     }
 
 
     @Override
     public Film findFilmById(int id) {
-        try {
-            String query="select * from film where film_id=" + id;
-
-            Film film = jdbcTemplate.query(query, reader::readFilm).get(0);
-            fillFilm(film);
-
-            return film;
-        } catch (IndexOutOfBoundsException e) {
-            log.warn("Попытка  получить несуществующий фильм");
+        String query = "select f.*,m.name as mpa_name, group_concat(fg.genre_id)as genres_ids"
+                + ",group_concat(g.name) as genres_names, group_concat(fl.user_id) as likes from film as f"
+                + " left join mpa as m on f.mpa_id=m.mpa_id left join film_genre as fg on f.film_id=fg.film_id"
+                + " left join genre as g on fg.genre_id=g.genre_id left join film_likes as fl on f.film_id=fl.film_id"
+                + " where f.film_id=" + id + " group by f.film_id";
+        List<Film> films = jdbcTemplate.query(query, new FilmMapper());
+        if (films.isEmpty()) {
+            LOG.warn("Попытка  получить несуществующий фильм");
             throw new FilmNotFoundException();
         }
+        return films.get(0);
     }
 
     @Override
     public Film createFilm(Film film) {
         if (!filmValidator.validate(film)) {
-            log.warn("Валидация фильма не пройдена");
+            LOG.warn("Валидация фильма не пройдена");
             throw new ValidationException();
         }
-            SimpleJdbcInsert simpleJdbcInsertFilm = new SimpleJdbcInsert(jdbcTemplate)
-                    .withTableName("film")
-                    .usingGeneratedKeyColumns("film_id");
-
-            int filmId = (int) simpleJdbcInsertFilm.executeAndReturnKey(film.toMap());
-            film.setId(filmId);
-            film.getGenres().forEach(genre -> addFilmsGenre(filmId, genre.getId()));
-            log.info("Добавлен фильм");
-            return findFilmById(filmId);
+        int filmId = (int) simpleJdbcInsertFilm.executeAndReturnKey(film.toMap());
+        film.getGenres().forEach(genre -> addFilmsGenre(filmId, genre.getId()));
+        film.setId(filmId);
+        LOG.info("Добавлен фильм");
+        return film;
     }
 
     @Override
     public Film changeFilm(Film film) {
-        String queryCheck="select film_id from film where film_id=" + film.getId();
-        if (!jdbcTemplate.queryForRowSet(queryCheck).next()) {
-            log.warn("Попытка изменить несуществующий фильм");
-            throw new FilmNotFoundException();
-        }
         if (!filmValidator.validate(film)) {
-            log.warn("Валидация фильма не пройдена");
+            LOG.warn("Валидация фильма не пройдена");
             throw new ValidationException();
         }
-        String query="select genre_id from genre " +
+        String query = "select genre_id from genre " +
                 "where genre_id in(select genre_id from film_genre where film_id=" + film.getId() + ")";
 
         List<Integer> genresId = jdbcTemplate.queryForList(query, Integer.class);
@@ -99,33 +93,28 @@ public class FilmDbStorage implements FilmStorage {
         String sqlQuery = "update film set " +
                 "name = ?, description = ?, release_date = ?,duration=?,mpa_id=? " +
                 "where film_id = ?";
-        jdbcTemplate.update(sqlQuery
+        int changes = jdbcTemplate.update(sqlQuery
                 , film.getName()
                 , film.getDescription()
                 , film.getReleaseDate()
                 , film.getDuration()
                 , film.getMpa().getId()
                 , film.getId());
-        log.info("Данные фильма изменены");
+        if (changes == 0) {
+            LOG.warn("Попытка изменить несуществующий фильм");
+            throw new FilmNotFoundException();
+        }
+        LOG.info("Данные фильма изменены");
         return findFilmById(film.getId());
     }
 
-    private void fillFilm(Film film) {
-        String queryGenre="select * from genre where genre_id in(select genre_id from film_genre" +
-                " where film_id=" + film.getId() + ")";
-        String queryLike="select user_id from film_likes";
-        String queryMpa="select * from mpa where mpa_id=" + film.getMpa().getId();
-
-        jdbcTemplate.query(queryGenre, reader::readGenre).forEach(film::addGenres);
-        jdbcTemplate.queryForList(queryLike, Integer.class).forEach(film::addLikes);
-        film.setMpa(jdbcTemplate.queryForObject(queryMpa, reader::readMpa));
-    }
-
     public void addFilmsGenre(int filmId, int genreId) {
-        jdbcTemplate.update("insert into film_genre (film_id,genre_id) values (?,?)", filmId, genreId);
+        String sqlQuery = "insert into film_genre (film_id,genre_id) values (?,?)";
+        jdbcTemplate.update(sqlQuery, filmId, genreId);
     }
 
     public void deleteFilmsGenre(int filmId, int genreId) {
-        jdbcTemplate.update("delete film_genre where film_id=? and genre_id=?", filmId, genreId);
+        String sqlQuery = "delete film_genre where film_id=? and genre_id=?";
+        jdbcTemplate.update(sqlQuery, filmId, genreId);
     }
 }

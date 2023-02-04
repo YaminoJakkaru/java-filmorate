@@ -12,12 +12,12 @@ import java.util.List;
 @RestController
 public class UserController {
     @Qualifier("UserDbStorage")
-    private final  UserStorage userStorage;
+    private final UserStorage userStorage;
     @Qualifier("UserDbService")
     private final UserService userService;
 
     @Autowired
-    public UserController(@Qualifier("UserDbStorage")UserStorage userStorage,@Qualifier("UserDbService")UserService userService) {
+    public UserController(@Qualifier("UserDbStorage") UserStorage userStorage, @Qualifier("UserDbService") UserService userService) {
         this.userStorage = userStorage;
         this.userService = userService;
     }

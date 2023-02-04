@@ -6,15 +6,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.Exceptions.UserNotFoundException;
-import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.id.Id;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,7 @@ public class InMemoryUserStorage implements UserStorage {
     private final Map<Integer, User> users = new HashMap<>();
     private final Id id;
     private final UserValidator userValidator;
-    private static final Logger log = LoggerFactory.getLogger(UserStorage.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UserStorage.class);
 
     @Autowired
     public InMemoryUserStorage( UserValidator userValidator) {
@@ -54,10 +53,10 @@ public class InMemoryUserStorage implements UserStorage {
                 user.setName(user.getLogin());
             }
             users.put(user.getId(), user);
-            log.info("Добавлен пользователь");
+            LOG.info("Добавлен пользователь");
             return user;
         }
-        log.warn("Валидация пользователя не пройдена");
+        LOG.warn("Валидация пользователя не пройдена");
         throw new ValidationException();
     }
 
@@ -65,14 +64,14 @@ public class InMemoryUserStorage implements UserStorage {
     public User changeUser(User user) {
         if (userValidator.validate(user)) {
             if (!users.containsKey(user.getId())) {
-                log.warn("Попытка изменить несуществующего пользователя");
+                LOG.warn("Попытка изменить несуществующего пользователя");
                 throw new NullPointerException();
             }
             users.put(user.getId(), user);
-            log.info("Пользователь изменен");
+            LOG.info("Пользователь изменен");
             return user;
         }
-        log.warn("Валидация пользователя не пройдена");
+        LOG.warn("Валидация пользователя не пройдена");
         throw new ValidationException();
     }
 }
