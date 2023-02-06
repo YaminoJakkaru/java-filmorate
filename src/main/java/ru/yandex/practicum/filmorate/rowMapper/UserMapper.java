@@ -21,7 +21,8 @@ public class UserMapper implements RowMapper<User> {
                 .birthday(resultSet.getDate("birthday").toLocalDate())
                 .build();
         if (resultSet.getString("friends") != null) {
-            Arrays.stream(resultSet.getString("friends").split(",")).forEach(i -> user.addFriend(Integer.parseInt(i)));
+            Arrays.stream(resultSet.getString("friends").split(","))
+                    .forEach(i -> user.addFriend(Integer.parseInt(i)));
         }
         return user;
     }

@@ -15,8 +15,8 @@ public class FilmMapper implements RowMapper<Film> {
 
     @Override
     public Film mapRow(ResultSet resultSet, int rowNum) throws SQLException {
-        Film film = Film.builder().
-                id(resultSet.getInt("film_id"))
+        Film film = Film.builder()
+                .id(resultSet.getInt("film_id"))
                 .name(resultSet.getString("name"))
                 .description(resultSet.getString("description"))
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
@@ -31,10 +31,10 @@ public class FilmMapper implements RowMapper<Film> {
             for (int i = 0; i < genreIds.length; i++) {
                 film.addGenres(Genre.builder().id(Integer.parseInt(genreIds[i])).name(genreNames[i]).build());
             }
-            if (resultSet.getString("likes") != null) {
-                Arrays.stream(resultSet.getString("likes").split(","))
-                        .forEach(like -> film.addLike(Integer.parseInt(like)));
-            }
+        }
+        if (resultSet.getString("likes") != null) {
+            Arrays.stream(resultSet.getString("likes").split(","))
+                    .forEach(like -> film.addLike(Integer.parseInt(like)));
         }
         return film;
     }

@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
 
@@ -108,11 +109,48 @@ public class FilmDbStorage implements FilmStorage {
         return findFilmById(film.getId());
     }
 
+    @Override
+    public void addLike(int id, int userId) {
+        String queryCheck = "select user_id from users where user_id=" + userId;
+        if (!jdbcTemplate.queryForRowSet(queryCheck).next()) {
+            LOG.warn("Попытка поставить лайк несуществующем пользователем");
+            throw new UserNotFoundException();
+        }
+        String query = "insert into film_likes(film_id,user_id) values (?,?)";
+        jdbcTemplate.update(query, id, userId);
+        LOG.info("Поставлен лайк");
+    }
+
+    @Override
+    public void deleteLike(int id, int userId) {
+        String queryCheck = "select user_id from users where user_id=" + userId;
+        if (!jdbcTemplate.queryForRowSet(queryCheck).next()) {
+            LOG.warn("Попытка удалить лайк несуществующем пользователем");
+            throw new UserNotFoundException();
+        }
+        String query = "delete from film_likes where film_id=? and user_id=?";
+        jdbcTemplate.update(query, id, userId);
+        LOG.info("Удален лайк");
+    }
+
+    @Override
+    public List<Film> getTopFilms(int count) {
+        String query = "select f.*,m.name as mpa_name, group_concat(fg.genre_id)as genres_ids"
+                + ",group_concat(g.name) as genres_names, group_concat(fl.user_id) as likes from film as f"
+                + " left join mpa as m on f.mpa_id=m.mpa_id left join film_genre as fg on f.film_id=fg.film_id"
+                + " left join genre as g on fg.genre_id=g.genre_id left join film_likes as fl on f.film_id=fl.film_id"
+                + " group by f.film_id order by count(fl.user_id) desc limit " + count;
+        LOG.info("Запрошен топ " + count + " популярных фильмов");
+        return jdbcTemplate.query(query, new FilmMapper());
+    }
+
+    @Override
     public void addFilmsGenre(int filmId, int genreId) {
         String sqlQuery = "insert into film_genre (film_id,genre_id) values (?,?)";
         jdbcTemplate.update(sqlQuery, filmId, genreId);
     }
 
+    @Override
     public void deleteFilmsGenre(int filmId, int genreId) {
         String sqlQuery = "delete film_genre where film_id=? and genre_id=?";
         jdbcTemplate.update(sqlQuery, filmId, genreId);

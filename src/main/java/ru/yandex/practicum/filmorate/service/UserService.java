@@ -1,16 +1,40 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.rowMapper.UserMapper;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
 
-public interface UserService {
+@Service
+@Qualifier("UserDbService")
+public class UserService {
 
-    public List<User> getFriends(int id);
+    private final UserStorage userStorage;
 
-    void makeFriends(int id, int friendId);
+    public UserService(@Qualifier("UserDbStorage") UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
-    void breakFriends(int id, int friendId);
+    public List<User> getFriends(int id) {
+        return userStorage.getFriends(id);
+    }
 
-    List<User> getMutualFriends(int id, int otherId);
+    public void makeFriends(int id, int friendId) {
+        userStorage.makeFriends(id, friendId);
+    }
+
+    public void breakFriends(int id, int friendId) {
+        userStorage.breakFriends(id, friendId);
+    }
+
+    public List<User> getMutualFriends(int id, int otherId) {
+        return userStorage.getMutualFriends(id, otherId);
+    }
 }
