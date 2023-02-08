@@ -28,7 +28,7 @@ public class GenreDbStorage implements GenreStorage {
         String query = "select * from genre where genre_id=" + id;
         List<Genre> genres = jdbcTemplate.query(query, new GenreMapper());
         if (genres.isEmpty()) {
-            LOG.warn("Попытка  получить несуществующий рейтинг");
+            LOG.warn("Попытка  получить несуществующий жанр");
             throw new NotFoundException();
         }
         return genres.get(0);
