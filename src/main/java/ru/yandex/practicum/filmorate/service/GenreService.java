@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 public class GenreService {
 
-    GenreStorage genreStorage;
+    private final GenreStorage genreStorage;
 
     @Autowired
     public GenreService(@Qualifier("GenreDbStorage") GenreStorage genreStorage) {

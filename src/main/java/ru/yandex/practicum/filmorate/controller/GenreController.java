@@ -14,7 +14,6 @@ import java.util.List;
 @RequestMapping("/genres")
 public class GenreController {
 
-
     private final GenreService genreService;
 
     @Autowired
@@ -22,7 +21,7 @@ public class GenreController {
         this.genreService = genreService;
     }
 
-    @GetMapping()
+    @GetMapping
     public List<Genre> getAllGenres() {
         return genreService.getAllGenre();
     }

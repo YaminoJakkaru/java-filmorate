@@ -16,36 +16,35 @@ import java.util.List;
 public class FilmController {
 
 
-    private final FilmStorage filmStorage;
+
     private final FilmService filmService;
 
 
     @Autowired
-    public FilmController(@Qualifier("FilmDbStorage") FilmStorage filmStorage, FilmService filmService) {
+    public FilmController(FilmService filmService) {
 
-        this.filmStorage = filmStorage;
         this.filmService = filmService;
 
     }
 
-    @GetMapping()
+    @GetMapping
     public List<Film> getFilms() {
-        return filmStorage.getAllFilms();
+        return filmService.getAllFilms();
     }
 
-    @PostMapping()
+    @PostMapping
     public Film create(@RequestBody Film film) {
-        return filmStorage.createFilm(film);
+        return filmService.createFilm(film);
     }
 
-    @PutMapping()
+    @PutMapping
     public Film change(@RequestBody Film film) {
-        return filmStorage.changeFilm(film);
+        return filmService.changeFilm(film);
     }
 
     @GetMapping("/{id}")
     public Film getFilm(@PathVariable int id) {
-        return filmStorage.findFilmById(id);
+        return filmService.findFilmById(id);
     }
 
     @PutMapping("/{id}/like/{userId}")

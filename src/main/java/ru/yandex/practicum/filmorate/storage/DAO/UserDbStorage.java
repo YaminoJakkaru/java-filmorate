@@ -19,13 +19,14 @@ import java.util.List;
 @Qualifier("UserDbStorage")
 public class UserDbStorage implements UserStorage {
     private static final Logger LOG = LoggerFactory.getLogger(UserStorage.class);
-    private final UserValidator userValidator;
     private final JdbcTemplate jdbcTemplate;
-
     SimpleJdbcInsert simpleJdbcInsertUser;
+    private static final String BASE_FIND_QUERY = "select u.*,group_concat(uf.friend_id) as friends "
+            + "from users as u  left  join user_friend as uf on u.user_id=uf.user_id";
+    private static final String GROUP_BY_ID_CLAUSE = " group by u.user_id ";
+    private static final String WHERE_ID_CLAUSE = " where u.user_id in (";
 
-    public UserDbStorage(UserValidator userValidator, JdbcTemplate jdbcTemplate) {
-        this.userValidator = userValidator;
+    public UserDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         simpleJdbcInsertUser = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
@@ -34,8 +35,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getAllUsers() {
-        String queryUser = "select u.*,group_concat(uf.friend_id) as friends "
-                + "from users as u  left  join user_friend as uf on u.user_id=uf.user_id group by u.user_id";
+        String queryUser = BASE_FIND_QUERY + GROUP_BY_ID_CLAUSE;
         List<User> users = jdbcTemplate.query(queryUser, new UserMapper());
         LOG.info("Запрошен список пользователей");
         return users;
@@ -44,9 +44,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User findUserById(int id) {
 
-        String query = "select u.*,group_concat(uf.friend_id) as friends from users as u  "
-                + "left  join user_friend as uf on u.user_id=uf.user_id where u.user_id=" + id
-                + " group by u.user_id";
+        String query = BASE_FIND_QUERY + WHERE_ID_CLAUSE + id + ")" + GROUP_BY_ID_CLAUSE;
         List<User> users = jdbcTemplate.query(query, new UserMapper());
         if (users.isEmpty()) {
             LOG.warn("Попытка  получить несуществующего пользователя");
@@ -57,10 +55,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User createUser(User user) {
-        if (!userValidator.validate(user)) {
-            LOG.warn("Валидация пользователя не пройдена");
-            throw new ValidationException();
-        }
+
         int userId = (int) simpleJdbcInsertUser.executeAndReturnKey(user.toMap());
         user.setId(userId);
         LOG.info("Добавлен пользователь");
@@ -69,10 +64,6 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User changeUser(User user) {
-        if (!userValidator.validate(user)) {
-            LOG.warn("Валидация пользователя не пройдена");
-            throw new ValidationException();
-        }
         String sqlQuery = "update users set " +
                 "email = ?,  login = ?,name=?,birthday=? " +
                 "where user_id = ?";
@@ -92,9 +83,8 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getFriends(int id) {
-        String queryUser = "select u.*,group_concat(uf.friend_id) as friends from users as u "
-                + "left  join user_friend as uf on u.user_id=uf.user_id "
-                + "where u.user_id in(select friend_id from user_friend where user_id=" + id + ") group by u.user_id";
+        String queryUser = BASE_FIND_QUERY + WHERE_ID_CLAUSE
+                + " select friend_id from user_friend where user_id=" + id + ")" + GROUP_BY_ID_CLAUSE;
         List<User> users = jdbcTemplate.query(queryUser, new UserMapper());
         return users;
     }
@@ -102,32 +92,21 @@ public class UserDbStorage implements UserStorage {
     @Override
     public void makeFriends(int id, int friendId) {
         String query = "insert into user_friend (user_id,friend_id) values (?,?)";
-        checkIds(id, friendId);
         jdbcTemplate.update(query, id, friendId);
     }
 
     @Override
     public void breakFriends(int id, int friendId) {
         String query = "delete user_friend where user_id=? and friend_id=?";
-        checkIds(id, friendId);
         jdbcTemplate.update(query, id, friendId);
     }
 
     @Override
     public List<User> getMutualFriends(int id, int otherId) {
-        checkIds(id, otherId);
-        String query = "select u.*,group_concat(uf.friend_id) as friends from users as u  "
-                + "left  join user_friend as uf on u.user_id=uf.user_id where u.user_id in(select uf1.friend_id "
-                + "from user_friend as uf1  inner join user_friend as uf2 on uf1.friend_id=uf2.friend_id"
-                + " where uf1.user_id=" + id + " and uf2.user_id=" + otherId + ") group by u.user_id";
+        String query = BASE_FIND_QUERY + WHERE_ID_CLAUSE + " select uf1.friend_id "
+                + "from user_friend as uf1  inner join user_friend as uf2 on uf1.friend_id=uf2.friend_id "
+                + " where uf1.user_id=" + id + " and uf2.user_id=" + otherId + ")" + GROUP_BY_ID_CLAUSE;
         return jdbcTemplate.query(query, new UserMapper());
     }
 
-    private void checkIds(int id, int otherId) {
-        String queryCheck = " select count (user_id) from users where user_id in (" + id + "," + otherId + ")";
-        if (jdbcTemplate.queryForObject(queryCheck, Integer.class)!= 2) {
-            LOG.warn("Попытка  получить несуществующего пользователя");
-            throw new UserNotFoundException();
-        }
-    }
 }

@@ -13,33 +13,31 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserStorage userStorage;
     private final UserService userService;
 
     @Autowired
-    public UserController(@Qualifier("UserDbStorage") UserStorage userStorage, UserService userService) {
-        this.userStorage = userStorage;
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
-    @GetMapping()
+    @GetMapping
     public List<User> getAllUsers() {
-        return userStorage.getAllUsers();
+        return userService.getAllUsers();
     }
 
-    @PostMapping()
+    @PostMapping
     public User create(@RequestBody User user) {
-        return userStorage.createUser(user);
+        return userService.createUser(user);
     }
 
-    @PutMapping()
+    @PutMapping
     public User change(@RequestBody User user) {
-        return userStorage.changeUser(user);
+        return userService.changeUser(user);
     }
 
     @GetMapping("/{id}")
     public User getUser(@PathVariable int id) {
-        return userStorage.findUserById(id);
+        return userService.findUserById(id);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
