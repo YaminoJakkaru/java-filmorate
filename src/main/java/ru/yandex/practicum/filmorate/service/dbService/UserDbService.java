@@ -19,12 +19,12 @@ import java.util.List;
 public class UserDbService implements UserService {
 
     private final UserStorage userStorage;
-    private  final UserStorageValidator userStorageValidator;
+    private final UserStorageValidator userStorageValidator;
     private final UserValidator userValidator;
     private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
     public UserDbService(@Qualifier("UserDbStorage") UserStorage userStorage,
-                         @Qualifier("UserDbStorageValidator")UserStorageValidator userStorageValidator,
+                         @Qualifier("UserDbStorageValidator") UserStorageValidator userStorageValidator,
                          UserValidator userValidator) {
         this.userStorage = userStorage;
         this.userStorageValidator = userStorageValidator;
@@ -67,7 +67,7 @@ public class UserDbService implements UserService {
 
     @Override
     public void makeFriends(int id, int friendId) {
-        if(!userStorageValidator.usersIdValidate(id,friendId)){
+        if (!userStorageValidator.usersIdValidate(id, friendId)) {
             LOG.warn("Пользователь не найден");
             throw new UserNotFoundException();
         }
@@ -76,7 +76,7 @@ public class UserDbService implements UserService {
 
     @Override
     public void breakFriends(int id, int friendId) {
-        if(!userStorageValidator.usersIdValidate(id,friendId)){
+        if (!userStorageValidator.usersIdValidate(id, friendId)) {
             LOG.warn("Пользователь не найден");
             throw new UserNotFoundException();
         }
@@ -85,7 +85,7 @@ public class UserDbService implements UserService {
 
     @Override
     public List<User> getMutualFriends(int id, int otherId) {
-        if(!userStorageValidator.usersIdValidate(id,otherId)){
+        if (!userStorageValidator.usersIdValidate(id, otherId)) {
             LOG.warn("Пользователь не найден");
             throw new UserNotFoundException();
         }

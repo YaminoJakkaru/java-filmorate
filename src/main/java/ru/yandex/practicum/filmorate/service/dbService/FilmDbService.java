@@ -18,17 +18,17 @@ import java.util.List;
 
 @Service
 @Qualifier("FilmDbService")
-public class FilmDbService implements FilmService{
+public class FilmDbService implements FilmService {
 
     private final FilmStorage filmStorage;
-    private  final UserStorageValidator userStorageValidator;
+    private final UserStorageValidator userStorageValidator;
 
     private final FilmValidator filmValidator;
     private static final Logger LOG = LoggerFactory.getLogger(FilmService.class);
 
     @Autowired
     public FilmDbService(@Qualifier("FilmDbStorage") FilmStorage filmStorage,
-                         @Qualifier("UserDbStorageValidator")UserStorageValidator userStorageValidator,
+                         @Qualifier("UserDbStorageValidator") UserStorageValidator userStorageValidator,
                          FilmValidator filmValidator) {
         this.filmStorage = filmStorage;
         this.userStorageValidator = userStorageValidator;
@@ -65,7 +65,7 @@ public class FilmDbService implements FilmService{
 
     @Override
     public void addLike(int id, int userId) {
-        if(!userStorageValidator.userIdValidate(userId)){
+        if (!userStorageValidator.userIdValidate(userId)) {
             LOG.warn("Пользователь не найден");
             throw new UserNotFoundException();
         }
@@ -74,7 +74,7 @@ public class FilmDbService implements FilmService{
 
     @Override
     public void deleteLike(int id, int userId) {
-        if(!userStorageValidator.userIdValidate(userId)){
+        if (!userStorageValidator.userIdValidate(userId)) {
             LOG.warn("Пользователь не найден");
             throw new UserNotFoundException();
         }
