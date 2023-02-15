@@ -20,6 +20,11 @@ public class DirectorDbService implements DirectorService {
     }
 
     @Override
+    public Director createDirector(Director director) {
+        return directorStorage.createDirector(director);
+    }
+
+    @Override
     public Director findDirectorById(int id) {
         return directorStorage.findDirectorById(id);
     }
@@ -27,5 +32,15 @@ public class DirectorDbService implements DirectorService {
     @Override
     public List<Director> getAllDirectors() {
         return directorStorage.getAllDirectors();
+    }
+
+    @Override
+    public Director changeDirector(Director director) {
+        return directorStorage.changeDirector(director);
+    }
+
+    @Override
+    public void deleteDirector(int id) {
+        directorStorage.deleteDirector(id);
     }
 }
