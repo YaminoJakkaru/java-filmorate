@@ -68,3 +68,10 @@ CREATE TABLE IF NOT EXISTS user_friend
     CONSTRAINT user_friend_user_fk FOREIGN KEY (user_id) REFERENCES users,
     CONSTRAINT user_friend_friend_fk FOREIGN KEY (friend_id) REFERENCES users
 );
+
+CREATE TABLE IF NOT EXISTS director
+(
+    director_id int PRIMARY KEY,
+    name   varchar(40)     NOT NULL,
+    CONSTRAINT director_pk PRIMARY KEY (director_id)
+);
