@@ -36,6 +36,8 @@ public class FilmDbStorage implements FilmStorage {
     private static final String ORDER_BY_COUNT_CLAUSE = " order by count(fl.user_id) desc ";
     private static final String WHERE_DIRECTOR_ID_CLAUSE = " where d.director_id= ";
     private static final String ORDER_BY_YEAR_CLAUSE = " order by f.release_date ";
+    private static final String WHERE_FILM_NAME_CLAUSE = " where lower(f.name) like ";
+    private static final String WHERE_DIRECTOR_NAME_CLAUSE = " where lower(d.name) like ";
 
     public FilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -173,5 +175,23 @@ public class FilmDbStorage implements FilmStorage {
             throw new NotFoundException();
         }
         return films;
+    }
+
+    @Override
+    public List<Film> getSearchedFilms(String searchQuery, String searchSource) {
+        String query = BASE_FIND_QUERY;
+        if ("director".equals(searchSource)) {
+            query += WHERE_DIRECTOR_NAME_CLAUSE + "'%" + searchQuery + "%'";
+        }
+        if ("title".equals(searchSource)) {
+            query += WHERE_FILM_NAME_CLAUSE + "'%" + searchQuery + "%'";
+        }
+        if ("director,title".equals(searchSource) ||
+                "title,director".equals(searchSource)) {
+            query += WHERE_DIRECTOR_NAME_CLAUSE + "'%" + searchQuery + "%'";
+            query += " or lower(f.name) like '%" + searchQuery + "%'";
+        }
+        query += GROUP_BY_ID_CLAUSE + ORDER_BY_YEAR_CLAUSE + " desc ";
+        return jdbcTemplate.query(query, new FilmMapper());
     }
 }
