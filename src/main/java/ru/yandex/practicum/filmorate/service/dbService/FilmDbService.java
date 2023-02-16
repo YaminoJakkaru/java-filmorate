@@ -85,4 +85,9 @@ public class FilmDbService implements FilmService {
     public List<Film> getTopFilms(int count) {
         return filmStorage.getTopFilms(count);
     }
+
+    @Override
+    public List<Film> getDirectorFilms(int directorId, String sortBy) {
+        return filmStorage.getDirectorFilms(directorId, sortBy);
+    }
 }
