@@ -75,3 +75,13 @@ CREATE TABLE IF NOT EXISTS director
     name   varchar(40)     NOT NULL,
     CONSTRAINT director_pk PRIMARY KEY (director_id)
 );
+
+CREATE TABLE IF NOT EXISTS film_director
+(
+    film_director_id int  as concat(film_id,director_id) PRIMARY KEY,
+    film_id  int NOT NULL,
+    director_id int NOT NULL,
+    CONSTRAINT film_director_id_pk PRIMARY KEY (film_director_id),
+    CONSTRAINT film_director_film_fk FOREIGN KEY (film_id) REFERENCES film,
+    CONSTRAINT film_director_director_fk FOREIGN KEY (director_id) REFERENCES director
+);
