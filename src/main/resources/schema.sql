@@ -1,4 +1,4 @@
-DROP TABLE mpa, film, genre, film_genre, users, film_likes, user_friend, reviews, review_like;
+//DROP TABLE mpa, film, genre, film_genre, users, film_likes, user_friend, reviews, review_like;
 CREATE TABLE IF NOT EXISTS mpa
 (
     mpa_id int PRIMARY KEY,
