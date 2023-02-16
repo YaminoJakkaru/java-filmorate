@@ -56,6 +56,8 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public void breakReview(int id) {
+        String queryReviewLikes = "delete review_like where review_id = ?";
+        jdbcTemplate.update(queryReviewLikes, id);
         String query = "delete reviews where review_id = ?";
         jdbcTemplate.update(query, id);
     }
