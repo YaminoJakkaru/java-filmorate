@@ -59,7 +59,7 @@ public class DirectorDbStorage implements DirectorStorage {
                 "name = ? " +
                 "where director_id = ?";
 
-        int changes = jdbcTemplate.update(sqlQuery, director.getName());
+        int changes = jdbcTemplate.update(sqlQuery, director.getName(), director.getId());
 
         if (changes == 0) {
             LOG.warn("Попытка изменить несуществующего режиссера");
@@ -71,7 +71,7 @@ public class DirectorDbStorage implements DirectorStorage {
 
     @Override
     public void deleteDirector(int id) {
-        String query = "delete director where director_id = ?";
+        String query = "delete from director where director_id = ?";
         jdbcTemplate.update(query, id);
         LOG.info("Режиссер с id=" + id + " был удален");
     }
