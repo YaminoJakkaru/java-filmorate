@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
 
@@ -33,6 +34,8 @@ public class FilmDbStorage implements FilmStorage {
     private static final String GROUP_BY_ID_CLAUSE = " group by f.film_id ";
     private static final String WHERE_ID_CLAUSE = " where f.film_id= ";
     private static final String ORDER_BY_COUNT_CLAUSE = " order by count(fl.user_id) desc ";
+    private static final String WHERE_DIRECTOR_ID_CLAUSE = " where d.director_id= ";
+    private static final String ORDER_BY_YEAR_CLAUSE = " order by f.release_date ";
 
     public FilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -152,5 +155,23 @@ public class FilmDbStorage implements FilmStorage {
     public void deleteFilmsDirector(int filmId, int directorId) {
         String sqlQuery = "delete from film_director where film_id=? and director_id=?";
         jdbcTemplate.update(sqlQuery, filmId, directorId);
+    }
+
+    @Override
+    public List<Film> getDirectorFilms(int directorId, String sortBy) {
+        String query = BASE_FIND_QUERY + WHERE_DIRECTOR_ID_CLAUSE + directorId + GROUP_BY_ID_CLAUSE;
+        if ("year".equals(sortBy)) {
+            query += ORDER_BY_YEAR_CLAUSE;
+        }
+        if ("likes".equals(sortBy)) {
+            query += ORDER_BY_COUNT_CLAUSE;
+        }
+
+        List<Film> films = jdbcTemplate.query(query, new FilmMapper());
+        if (films.isEmpty()) {
+            LOG.warn("Попытка  получить фильмы несуществующего режиссера");
+            throw new NotFoundException();
+        }
+        return films;
     }
 }
