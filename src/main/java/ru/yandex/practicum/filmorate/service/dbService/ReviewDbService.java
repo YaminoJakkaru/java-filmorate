@@ -6,12 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
-import ru.yandex.practicum.filmorate.storage.DAO.ReviewDbStorageValidator;
-import ru.yandex.practicum.filmorate.storage.FilmStorageValidator;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewStorageValidator;
 import ru.yandex.practicum.filmorate.storage.UserStorageValidator;
@@ -26,19 +23,16 @@ public class ReviewDbService implements ReviewService {
     private final ReviewStorage reviewStorage;
     private final ReviewValidator reviewValidator;
     private final UserStorageValidator userStorageValidator;
-    private final FilmStorageValidator filmStorageValidator;
     private final ReviewStorageValidator reviewStorageValidator;
     private static final Logger LOG = LoggerFactory.getLogger(ReviewService.class);
 
     @Autowired
     public ReviewDbService(@Qualifier("ReviewDbStorage") ReviewStorage reviewStorage,
                            @Qualifier("UserDbStorageValidator") UserStorageValidator userStorageValidator,
-                           @Qualifier("FilmDbStorageValidator") FilmStorageValidator filmStorageValidator,
                            @Qualifier("ReviewDbStorageValidator") ReviewStorageValidator reviewStorageValidator,
                            ReviewValidator reviewValidator) {
         this.reviewStorage = reviewStorage;
         this.userStorageValidator = userStorageValidator;
-        this.filmStorageValidator = filmStorageValidator;
         this.reviewStorageValidator = reviewStorageValidator;
         this.reviewValidator = reviewValidator;
     }
@@ -48,12 +42,8 @@ public class ReviewDbService implements ReviewService {
             LOG.warn("Валидация отзыва не пройдена");
             throw new ValidationException();
         }
-        if (!filmStorageValidator.filmIdValidate(review.getFilmId())) {
-            LOG.warn("Валидация отзыва не пройдена. Фильм не найден");
-            throw new NotFoundException();
-        }
-        if (!userStorageValidator.userIdValidate(review.getUserId())) {
-            LOG.warn("Валидация отзыва не пройдена. Пользователь не найден");
+        if (!reviewStorageValidator.checkUserFilmValidate(review.getUserId(), review.getFilmId())) {
+            LOG.warn("Валидация отзыва не пройдена");
             throw new NotFoundException();
         }
         return reviewStorage.createReview(review);
@@ -80,50 +70,34 @@ public class ReviewDbService implements ReviewService {
     }
 
     public void addLike(int id, int userId) {
-        if (!userStorageValidator.userIdValidate(userId)) {
-            LOG.warn("Пользователь не найден");
-            throw new UserNotFoundException();
-        }
-        if (!reviewStorageValidator.reviewLikeValidate(id, userId, true)) {
+        if (reviewStorageValidator.checkUserAndLike(id, userId, true) == 1) {
             reviewStorage.addLike(id, userId);
         } else {
-            LOG.warn("Пользователь уже поставил лайк этому отзыву");
+            LOG.warn("Проверка пользователя и лайка не пройдена");
         }
     }
 
     public void addDislike(int id, int userId) {
-        if (!userStorageValidator.userIdValidate(userId)) {
-            LOG.warn("Пользователь не найден");
-            throw new UserNotFoundException();
-        }
-        if (!reviewStorageValidator.reviewLikeValidate(id, userId, false)) {
+        if (reviewStorageValidator.checkUserAndLike(id, userId, false) == 1) {
             reviewStorage.addDislike(id, userId);
         } else {
-            LOG.warn("Пользователь уже поставил дизлайк этому отзыву");
+            LOG.warn("Проверка пользователя и лайка не пройдена");
         }
     }
 
     public void deleteLike(int id, int userId) {
-        if (!userStorageValidator.userIdValidate(userId)) {
-            LOG.warn("Пользователь не найден");
-            throw new UserNotFoundException();
-        }
-        if (reviewStorageValidator.reviewLikeValidate(id, userId, true)) {
+        if (reviewStorageValidator.checkUserAndLike(id, userId, true) == 2) {
             reviewStorage.deleteLike(id, userId);
         } else {
-            LOG.warn("Пользователь не ставил лайк этому отзыву");
+            LOG.warn("Проверка пользователя и лайка не пройдена");
         }
     }
 
     public void deleteDislike(int id, int userId) {
-        if (!userStorageValidator.userIdValidate(userId)) {
-            LOG.warn("Пользователь не найден");
-            throw new UserNotFoundException();
-        }
-        if (reviewStorageValidator.reviewLikeValidate(id, userId, false)) {
+        if (reviewStorageValidator.checkUserAndLike(id, userId, false) == 2) {
             reviewStorage.deleteDislike(id, userId);
         } else {
-            LOG.warn("Пользователь не ставил дизлайк этому отзыву");
+            LOG.warn("Проверка пользователя и лайка не пройдена");
         }
     }
 }

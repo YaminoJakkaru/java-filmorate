@@ -17,8 +17,7 @@ import java.util.List;
 @Qualifier("ReviewDbStorage")
 public class ReviewDbStorage implements ReviewStorage {
 
-    private static final String BASE_FIND_QUERY = "select r.review_id AS review_id, r.content AS content, " +
-            " r.is_positive AS is_positive, r.user_id AS user_id, r.film_id AS film_id, " +
+    private static final String BASE_FIND_QUERY = "select r.*, " +
             "(count(rl.review_id) - count(rd.review_id)) AS useful " +
             "from reviews AS r " +
             "left join review_like AS rl on r.review_id = rl.review_id " +
@@ -81,7 +80,8 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public List<Review> getReviews(int filmId, int count) {
         if (filmId != 0) {
-            String query = BASE_FIND_QUERY + "where film_id = ? group by r.review_id order by useful DESC, review_id ASC limit ?";
+            String query = BASE_FIND_QUERY + "where film_id = ? group by r.review_id " +
+                           "order by useful DESC, review_id ASC limit ?";
             return jdbcTemplate.query(query, new ReviewMapper(), filmId, count);
         }
         String query = BASE_FIND_QUERY + " group by r.review_id order by useful DESC, review_id ASC limit ?";
