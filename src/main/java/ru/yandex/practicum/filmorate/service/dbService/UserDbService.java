@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -13,6 +14,7 @@ import ru.yandex.practicum.filmorate.storage.UserStorageValidator;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @Qualifier("UserDbService")
@@ -90,5 +92,10 @@ public class UserDbService implements UserService {
             throw new UserNotFoundException();
         }
         return userStorage.getMutualFriends(id, otherId);
+    }
+
+    @Override
+    public Stream<Film> getLikedFilms(int id) {
+        return userStorage.getLikedFilms(id);
     }
 }

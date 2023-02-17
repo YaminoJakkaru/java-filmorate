@@ -1,25 +1,31 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.service.dbService.FilmDbService;
 
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/films")
+@Slf4j
 public class FilmController {
 
 
     private final FilmService filmService;
+    private final UserService userService;
 
 
     @Autowired
-    public FilmController(@Qualifier("FilmDbService") FilmService filmService) {
+    public FilmController(@Qualifier("FilmDbService") FilmService filmService, @Qualifier("UserDbService") UserService userService) {
+        this.userService = userService;
         this.filmService = filmService;
     }
 
@@ -56,5 +62,15 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getTopFilms(@RequestParam(defaultValue = "10") int count) {
         return filmService.getTopFilms(count);
+    }
+
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(@RequestParam int userId, @RequestParam int friendId) {
+        List<Film> userFilms = userService.getLikedFilms(userId).collect(Collectors.toList());
+        List<Film> friendFilms = userService.getLikedFilms(friendId).collect(Collectors.toList());
+        log.info(userFilms.toString());
+        userFilms.retainAll(friendFilms);
+        log.info(userFilms.toString());
+        return userFilms;
     }
 }

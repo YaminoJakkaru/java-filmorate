@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 public interface UserService {
 
@@ -21,4 +23,6 @@ public interface UserService {
     void breakFriends(int id, int friendId);
 
     List<User> getMutualFriends(int id, int otherId);
+
+    Stream<Film> getLikedFilms(int id);
 }
