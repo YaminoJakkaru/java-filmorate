@@ -17,8 +17,14 @@ public class ReviewDbStorageValidator implements ReviewStorageValidator {
 
     @Override
     public boolean reviewLikeValidate(int reviewId, int userId, boolean isLike) {
-        String queryCheck = "select review_like_id from review_like where review_id = " + reviewId +
-                " and user_id = " + userId + " and is_like = " + isLike;
+        String queryCheck;
+        if (isLike == true) {
+            queryCheck = "select review_like_id from review_like where review_id = " + reviewId +
+                    " and user_id = " + userId;
+        } else {
+            queryCheck = "select review_dislike_id from review_dislike where review_id = " + reviewId +
+                    " and user_id = " + userId;
+        }
         return jdbcTemplate.queryForRowSet(queryCheck).next();
     }
 }

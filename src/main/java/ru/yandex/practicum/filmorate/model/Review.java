@@ -10,7 +10,6 @@ import java.util.Map;
 public class Review {
 
     private int reviewId;
-
     private String content;
     private Boolean isPositive;
     private int userId;
