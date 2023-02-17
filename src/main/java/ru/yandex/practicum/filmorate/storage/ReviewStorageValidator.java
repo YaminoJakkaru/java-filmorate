@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 public interface ReviewStorageValidator {
 
-    boolean checkUserFilmValidate(int userId, int film_id);
+    boolean reviewLikeValidate(int reviewId, int userId, boolean isLike);
 
-    int checkUserAndLike(int id, int userId, boolean isLike);
+    boolean checkUserFilmValidate(int userId, int film_id);
 }

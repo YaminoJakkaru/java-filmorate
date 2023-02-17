@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
@@ -70,34 +71,54 @@ public class ReviewDbService implements ReviewService {
     }
 
     public void addLike(int id, int userId) {
-        if (reviewStorageValidator.checkUserAndLike(id, userId, true) == 1) {
-            reviewStorage.addLike(id, userId);
-        } else {
-            LOG.warn("Проверка пользователя и лайка не пройдена");
+        if (!userStorageValidator.userIdValidate(userId)) {
+            LOG.warn("Пользователь не найден");
+            throw new UserNotFoundException();
         }
+        if (!reviewStorageValidator.reviewLikeValidate(id, userId, true)) {
+            reviewStorage.addLike(id, userId);
+            return;
+        }
+        LOG.warn("Пользователь уже поставил лайк этому отзыву");
     }
+
 
     public void addDislike(int id, int userId) {
-        if (reviewStorageValidator.checkUserAndLike(id, userId, false) == 1) {
-            reviewStorage.addDislike(id, userId);
-        } else {
-            LOG.warn("Проверка пользователя и лайка не пройдена");
+        if (!userStorageValidator.userIdValidate(userId)) {
+            LOG.warn("Пользователь не найден");
+            throw new UserNotFoundException();
         }
+        if (!reviewStorageValidator.reviewLikeValidate(id, userId, false)) {
+            reviewStorage.addDislike(id, userId);
+            return;
+        }
+        LOG.warn("Пользователь уже поставил дизлайк этому отзыву");
     }
+
 
     public void deleteLike(int id, int userId) {
-        if (reviewStorageValidator.checkUserAndLike(id, userId, true) == 2) {
-            reviewStorage.deleteLike(id, userId);
-        } else {
-            LOG.warn("Проверка пользователя и лайка не пройдена");
+        if (!userStorageValidator.userIdValidate(userId)) {
+            LOG.warn("Пользователь не найден");
+            throw new UserNotFoundException();
         }
+        if (reviewStorageValidator.reviewLikeValidate(id, userId, true)) {
+            reviewStorage.deleteLike(id, userId);
+            return;
+        }
+        LOG.warn("Пользователь не ставил лайк этому отзыву");
     }
 
+
     public void deleteDislike(int id, int userId) {
-        if (reviewStorageValidator.checkUserAndLike(id, userId, false) == 2) {
-            reviewStorage.deleteDislike(id, userId);
-        } else {
-            LOG.warn("Проверка пользователя и лайка не пройдена");
+        if (!userStorageValidator.userIdValidate(userId)) {
+            LOG.warn("Пользователь не найден");
+            throw new UserNotFoundException();
         }
+        if (reviewStorageValidator.reviewLikeValidate(id, userId, false)) {
+            reviewStorage.deleteDislike(id, userId);
+            return;
+        }
+        LOG.warn("Пользователь не ставил дизлайк этому отзыву");
     }
+
 }
