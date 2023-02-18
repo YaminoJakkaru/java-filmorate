@@ -66,11 +66,6 @@ public class FilmController {
 
     @GetMapping("/common")
     public List<Film> getCommonFilms(@RequestParam int userId, @RequestParam int friendId) {
-        List<Film> userFilms = userService.getLikedFilms(userId).collect(Collectors.toList());
-        List<Film> friendFilms = userService.getLikedFilms(friendId).collect(Collectors.toList());
-        log.info(userFilms.toString());
-        userFilms.retainAll(friendFilms);
-        log.info(userFilms.toString());
-        return userFilms;
+        return filmService.getCommonFilms(userId, friendId);
     }
 }

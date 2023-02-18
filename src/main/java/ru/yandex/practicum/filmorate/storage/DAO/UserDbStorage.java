@@ -118,10 +118,4 @@ public class UserDbStorage implements UserStorage {
                 + " where uf1.user_id=" + id + " and uf2.user_id=" + otherId + ")" + GROUP_BY_ID_CLAUSE;
         return jdbcTemplate.query(query, new UserMapper());
     }
-
-    @Override
-    public Stream<Film> getLikedFilms(int id) {
-        String query = BASE_FIND_FILM_QUERY + WHERE_FILM_ID_CLAUSE + "(SELECT film_id FROM film_likes WHERE user_id = " + id + ")" + GROUP_FILM_BY_ID_CLAUSE;
-        return jdbcTemplate.query(query, new FilmMapper()).stream();
-    }
 }

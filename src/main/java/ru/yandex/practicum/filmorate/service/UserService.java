@@ -23,6 +23,4 @@ public interface UserService {
     void breakFriends(int id, int friendId);
 
     List<User> getMutualFriends(int id, int otherId);
-
-    Stream<Film> getLikedFilms(int id);
 }

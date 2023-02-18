@@ -30,6 +30,7 @@ public class FilmDbStorage implements FilmStorage {
             + " left join genre as g on fg.genre_id=g.genre_id left join film_likes as fl on f.film_id=fl.film_id ";
     private static final String GROUP_BY_ID_CLAUSE = " group by f.film_id ";
     private static final String WHERE_ID_CLAUSE = " where f.film_id= ";
+    private static final String WHERE_ID_IN_CLAUSE = " where f.film_id IN ";
     private static final String ORDER_BY_COUNT_CLAUSE = " order by count(fl.user_id) desc ";
 
     public FilmDbStorage(JdbcTemplate jdbcTemplate) {
@@ -127,5 +128,17 @@ public class FilmDbStorage implements FilmStorage {
     public void deleteFilmsGenre(int filmId, int genreId) {
         String sqlQuery = "delete film_genre where film_id=? and genre_id=?";
         jdbcTemplate.update(sqlQuery, filmId, genreId);
+    }
+
+    @Override
+    public List<Film> getCommonFilms(int userId, int friendId) {
+        //String query = BASE_FIND_QUERY + WHERE_ID_IN_CLAUSE + id + GROUP_BY_ID_CLAUSE;
+        String q = BASE_FIND_QUERY +
+                " LEFT JOIN film_likes l on f.film_id = l.film_id" +
+                " WHERE f.film_id IN (SELECT DISTINCT sf.film_id FROM (SELECT film_likes.film_id FROM film_likes WHERE user_id = ?) AS ff" +
+                " INNER JOIN (SELECT film_likes.film_id FROM film_likes WHERE user_id = ?) AS sf ON ff.film_id = sf.film_id)" +
+                " GROUP BY f.film_id" +
+                " ORDER BY COUNT(l.film_id) DESC";
+        return jdbcTemplate.query(q, new FilmMapper(), userId, friendId);
     }
 }

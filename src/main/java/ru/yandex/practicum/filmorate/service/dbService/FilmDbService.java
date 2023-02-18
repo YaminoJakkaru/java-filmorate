@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.rowMapper.FilmMapper;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorageValidator;
@@ -84,5 +85,10 @@ public class FilmDbService implements FilmService {
     @Override
     public List<Film> getTopFilms(int count) {
         return filmStorage.getTopFilms(count);
+    }
+
+    @Override
+    public List<Film> getCommonFilms(int userId, int friendId) {
+        return filmStorage.getCommonFilms(userId, friendId);
     }
 }

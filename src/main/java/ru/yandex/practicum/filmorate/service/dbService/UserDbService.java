@@ -93,9 +93,4 @@ public class UserDbService implements UserService {
         }
         return userStorage.getMutualFriends(id, otherId);
     }
-
-    @Override
-    public Stream<Film> getLikedFilms(int id) {
-        return userStorage.getLikedFilms(id);
-    }
 }
