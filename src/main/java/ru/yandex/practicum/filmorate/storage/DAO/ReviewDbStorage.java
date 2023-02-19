@@ -115,4 +115,10 @@ public class ReviewDbStorage implements ReviewStorage {
         jdbcTemplate.update(query, id, userId);
         LOG.info("Удален лайк к отзыву");
     }
+
+    @Override
+    public int getReviewAuthorId(int id){
+        String query = "select user_id from reviews where review_id =" + id;
+        return jdbcTemplate.queryForObject(query,Integer.class);
+    }
 }
