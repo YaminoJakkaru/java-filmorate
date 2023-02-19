@@ -103,4 +103,9 @@ public class FilmDbService implements FilmService {
     public List<Film> getSearchedFilms(String searchQuery, String searchSource) {
         return filmStorage.getSearchedFilms(searchQuery, searchSource);
     }
+
+    @Override
+    public void deleteFilm(int id) {
+        filmStorage.deleteFilm(id);
+    }
 }
