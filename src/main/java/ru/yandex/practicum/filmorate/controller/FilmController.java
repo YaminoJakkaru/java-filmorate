@@ -57,16 +57,4 @@ public class FilmController {
     public List<Film> getTopFilms(@RequestParam(defaultValue = "10") int count) {
         return filmService.getTopFilms(count);
     }
-
-    @GetMapping("/director/{directorId}")
-    public List<Film> getDirectorFilms(@PathVariable int directorId,
-                                       @RequestParam String sortBy) {
-        return filmService.getDirectorFilms(directorId, sortBy);
-    }
-
-    @GetMapping("/search")
-    public List<Film> getSearchedFilms(@RequestParam("query") String searchQuery,
-                                       @RequestParam("by") String searchSource) {
-        return filmService.getSearchedFilms(searchQuery.toLowerCase(), searchSource);
-    }
 }

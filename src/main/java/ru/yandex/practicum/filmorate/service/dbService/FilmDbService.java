@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorageValidator;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
@@ -22,21 +21,16 @@ import java.util.List;
 public class FilmDbService implements FilmService {
 
     private final FilmStorage filmStorage;
-    private final EventStorage eventStorage;
     private final UserStorageValidator userStorageValidator;
+
     private final FilmValidator filmValidator;
     private static final Logger LOG = LoggerFactory.getLogger(FilmService.class);
-    private static final int LIKE = 1;
-    private static final int REMOVE = 1;
-    private static final int ADD = 2;
 
     @Autowired
     public FilmDbService(@Qualifier("FilmDbStorage") FilmStorage filmStorage,
-                         @Qualifier("EventDbStorage")EventStorage eventStorage,
                          @Qualifier("UserDbStorageValidator") UserStorageValidator userStorageValidator,
                          FilmValidator filmValidator) {
         this.filmStorage = filmStorage;
-        this.eventStorage = eventStorage;
         this.userStorageValidator = userStorageValidator;
         this.filmValidator = filmValidator;
     }
@@ -75,7 +69,6 @@ public class FilmDbService implements FilmService {
             LOG.warn("Пользователь не найден");
             throw new UserNotFoundException();
         }
-        eventStorage.createEvent(userId,id,LIKE,ADD);
         filmStorage.addLike(id, userId);
     }
 
@@ -85,22 +78,11 @@ public class FilmDbService implements FilmService {
             LOG.warn("Пользователь не найден");
             throw new UserNotFoundException();
         }
-        eventStorage.createEvent(userId,id,LIKE,REMOVE);
         filmStorage.deleteLike(id, userId);
     }
 
     @Override
     public List<Film> getTopFilms(int count) {
         return filmStorage.getTopFilms(count);
-    }
-
-    @Override
-    public List<Film> getDirectorFilms(int directorId, String sortBy) {
-        return filmStorage.getDirectorFilms(directorId, sortBy);
-    }
-
-    @Override
-    public List<Film> getSearchedFilms(String searchQuery, String searchSource) {
-        return filmStorage.getSearchedFilms(searchQuery, searchSource);
     }
 }

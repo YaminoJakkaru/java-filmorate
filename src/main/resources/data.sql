@@ -20,15 +20,3 @@ merge into mpa (mpa_id, name)
 values (4, 'R');
 merge into mpa (mpa_id, name)
 values (5, 'NC-17');
-merge into event_type (event_type_id, name)
-    values (1, 'LIKE');
-merge into event_type (event_type_id, name)
-    values (2, 'REVIEW');
-merge into event_type (event_type_id, name)
-    values (3, 'FRIEND');
-merge into operation (operation_id, name)
-    values (1, 'REMOVE');
-merge into operation (operation_id, name)
-    values (2, 'ADD');
-merge into operation (operation_id, name)
-        values (3, 'UPDATE');

@@ -19,7 +19,6 @@ public class Film {
     private Mpa mpa;
     private final List<Genre> genres = new ArrayList<>();
     private final Set<Integer> likes = new HashSet<>();
-    private final List<Director> directors = new ArrayList<>();
 
 
     public void addLike(int id) {
@@ -36,14 +35,6 @@ public class Film {
 
     public void deleteGenres(int genreId) {
         genres.remove(genreId);
-    }
-
-    public void addDirectors(Director director) {
-        directors.add(director);
-    }
-
-    public void deleteDirectors(int directorId) {
-        directors.remove(directorId);
     }
 
     public Map<String, Object> toMap() {

@@ -19,8 +19,4 @@ public interface FilmService {
     void deleteLike(int id, int userId);
 
     List<Film> getTopFilms(int count);
-
-    List<Film> getDirectorFilms(int directorId, String sortBy);
-
-    List<Film> getSearchedFilms(String searchQuery, String searchSource);
 }
