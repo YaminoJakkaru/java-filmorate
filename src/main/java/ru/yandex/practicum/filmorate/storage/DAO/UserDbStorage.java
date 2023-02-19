@@ -109,4 +109,11 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.query(query, new UserMapper());
     }
 
+    @Override
+    public void deleteUser(int id) {
+        String query = "delete from users where user_id=?";
+        jdbcTemplate.update(query, id);
+        LOG.info("Удален пользователь с id = " + id);
+    }
+
 }
