@@ -64,8 +64,14 @@ public class UserController {
         return userService.getMutualFriends(id, otherId);
     }
 
+
     @GetMapping("/{id}/feed")
     public List<Event> getFeed(@PathVariable int id){
         return eventService.getFeed(id);
+
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable int id) {
+        userService.deleteUser(id);
+
     }
 }

@@ -72,6 +72,10 @@ public class UserDbService implements UserService {
 
     @Override
     public List<User> getFriends(int id) {
+        if (!userStorageValidator.userIdValidate(id)) {
+            LOG.warn("Пользователь не найден");
+            throw new UserNotFoundException();
+        }
         return userStorage.getFriends(id);
     }
 
@@ -102,5 +106,14 @@ public class UserDbService implements UserService {
             throw new UserNotFoundException();
         }
         return userStorage.getMutualFriends(id, otherId);
+    }
+
+    @Override
+    public void deleteUser(int id) {
+        if (!userStorageValidator.userIdValidate(id)) {
+            LOG.warn("Пользователь не найден");
+            throw new UserNotFoundException();
+        }
+        userStorage.deleteUser(id);
     }
 }
