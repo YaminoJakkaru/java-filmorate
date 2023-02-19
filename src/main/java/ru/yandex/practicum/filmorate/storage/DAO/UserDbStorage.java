@@ -29,13 +29,6 @@ public class UserDbStorage implements UserStorage {
     private static final String GROUP_BY_ID_CLAUSE = " group by u.user_id ";
     private static final String WHERE_ID_CLAUSE = " where u.user_id in (";
 
-    private static final String BASE_FIND_FILM_QUERY = "select f.*,m.name as mpa_name, group_concat(fg.genre_id)as genres_ids,"
-            + "group_concat(g.name) as genres_names, group_concat(fl.user_id) as likes from film as f"
-            + " left join mpa as m on f.mpa_id=m.mpa_id left join film_genre as fg on f.film_id=fg.film_id"
-            + " left join genre as g on fg.genre_id=g.genre_id left join film_likes as fl on f.film_id=fl.film_id ";
-    private static final String GROUP_FILM_BY_ID_CLAUSE = " group by f.film_id ";
-    private static final String WHERE_FILM_ID_CLAUSE = " where f.film_id IN ";
-
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         simpleJdbcInsertUser = new SimpleJdbcInsert(jdbcTemplate)

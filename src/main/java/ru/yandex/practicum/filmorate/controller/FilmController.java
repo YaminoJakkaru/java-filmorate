@@ -15,17 +15,13 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/films")
-@Slf4j
 public class FilmController {
 
 
     private final FilmService filmService;
-    private final UserService userService;
-
 
     @Autowired
-    public FilmController(@Qualifier("FilmDbService") FilmService filmService, @Qualifier("UserDbService") UserService userService) {
-        this.userService = userService;
+    public FilmController(@Qualifier("FilmDbService") FilmService filmService) {
         this.filmService = filmService;
     }
 
