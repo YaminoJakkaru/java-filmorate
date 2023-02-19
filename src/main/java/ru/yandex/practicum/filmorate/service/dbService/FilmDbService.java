@@ -90,8 +90,8 @@ public class FilmDbService implements FilmService {
     }
 
     @Override
-    public List<Film> getTopFilms(int count) {
-        return filmStorage.getTopFilms(count);
+    public List<Film> getTopFilms(int count, String genreId, String year) {
+        return filmStorage.getTopFilms(count, genreId, year);
     }
 
     @Override
