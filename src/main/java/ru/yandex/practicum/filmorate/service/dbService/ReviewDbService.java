@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewStorageValidator;
 import ru.yandex.practicum.filmorate.storage.UserStorageValidator;
@@ -22,17 +23,24 @@ import java.util.List;
 public class ReviewDbService implements ReviewService {
 
     private final ReviewStorage reviewStorage;
+    private final EventStorage eventStorage;
     private final ReviewValidator reviewValidator;
     private final UserStorageValidator userStorageValidator;
     private final ReviewStorageValidator reviewStorageValidator;
     private static final Logger LOG = LoggerFactory.getLogger(ReviewService.class);
+    private static final int REVIEW = 2;
+    private static final int REMOVE = 1;
+    private static final int ADD = 2;
+    private static final int UPDATE = 3;
 
     @Autowired
     public ReviewDbService(@Qualifier("ReviewDbStorage") ReviewStorage reviewStorage,
+                           @Qualifier("EventDbStorage")EventStorage eventStorage,
                            @Qualifier("UserDbStorageValidator") UserStorageValidator userStorageValidator,
                            @Qualifier("ReviewDbStorageValidator") ReviewStorageValidator reviewStorageValidator,
                            ReviewValidator reviewValidator) {
         this.reviewStorage = reviewStorage;
+        this.eventStorage = eventStorage;
         this.userStorageValidator = userStorageValidator;
         this.reviewStorageValidator = reviewStorageValidator;
         this.reviewValidator = reviewValidator;
@@ -47,7 +55,9 @@ public class ReviewDbService implements ReviewService {
             LOG.warn("Валидация отзыва не пройдена");
             throw new NotFoundException();
         }
-        return reviewStorage.createReview(review);
+        review=reviewStorage.createReview(review);
+        eventStorage.createEvent(review.getUserId(), review.getReviewId(), REVIEW,ADD);
+        return review;
     }
 
     public Review changeReview(Review review) {
@@ -55,10 +65,13 @@ public class ReviewDbService implements ReviewService {
             LOG.warn("Пользователь не найден");
             throw new ValidationException();
         }
-        return reviewStorage.changeReview(review);
+        review=reviewStorage.changeReview(review);
+        eventStorage.createEvent(review.getUserId(), review.getReviewId(), REVIEW,UPDATE);
+        return review;
     }
 
     public void breakReview(int id) {
+        eventStorage.createEvent(reviewStorage.getReviewAuthorId(id), id, REVIEW,REMOVE);
         reviewStorage.breakReview(id);
     }
 

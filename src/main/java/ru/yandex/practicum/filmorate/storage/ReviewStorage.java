@@ -23,4 +23,6 @@ public interface ReviewStorage {
     void deleteLike(int id, int userId);
 
     void deleteDislike(int id, int userId);
+
+    int getReviewAuthorId (int id);
 }
