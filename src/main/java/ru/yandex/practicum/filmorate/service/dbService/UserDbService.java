@@ -127,7 +127,7 @@ public class UserDbService implements UserService {
     @Override
     public List<Film> getRecommendFilms(int id) {
         return filmStorage.getRecommendFilms(id);
-
+    }
     public void deleteUser(int id) {
         if (!userStorageValidator.userIdValidate(id)) {
             LOG.warn("Пользователь не найден");

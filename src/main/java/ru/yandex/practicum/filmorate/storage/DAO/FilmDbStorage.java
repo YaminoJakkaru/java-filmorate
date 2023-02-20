@@ -188,14 +188,16 @@ public class FilmDbStorage implements FilmStorage {
         String query = BASE_FIND_QUERY +
                 " WHERE f.film_id IN " +
                 "(SELECT DISTINCT film_id FROM film_likes WHERE film_id NOT IN (SELECT film_id FROM film_likes " +
-                "WHERE user_id = ?) AND user_id IN (SELECT user_id AS _user_id, FROM film_likes WHERE film_id IN " +
-                "(SELECT film_id FROM film_likes WHERE user_id = ?) GROUP BY _user_id ORDER BY COUNT (film_id) DESC " +
+                "WHERE user_id = ?) AND user_id IN (SELECT user_id  FROM film_likes WHERE film_id IN " +
+                "(SELECT film_id FROM film_likes WHERE user_id = ?) GROUP BY user_id ORDER BY COUNT (film_id) DESC " +
                 "))" + GROUP_BY_ID_CLAUSE;
         return jdbcTemplate.query(query, new FilmMapper(), id, id);
-    public void addFilmsDirector(int filmId, int directorId) {
-        String sqlQuery = "insert into film_director (film_id,director_id) values (?,?)";
-        jdbcTemplate.update(sqlQuery, filmId, directorId);
     }
+        public void addFilmsDirector ( int filmId, int directorId){
+            String sqlQuery = "insert into film_director (film_id,director_id) values (?,?)";
+            jdbcTemplate.update(sqlQuery, filmId, directorId);
+        }
+
 
     @Override
     public void deleteFilmsDirector(int filmId, int directorId) {
