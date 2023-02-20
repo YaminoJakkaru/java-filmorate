@@ -68,7 +68,6 @@ public class UserController {
         return userService.getMutualFriends(id, otherId);
     }
 
-
     @GetMapping("/{id}/recommendations")
     public List<Film> getRecommendFilms(@PathVariable int id) {
         return userService.getRecommendFilms(id);
@@ -82,6 +81,5 @@ public class UserController {
     @GetMapping("/{id}/feed")
     public List<Event> getFeed(@PathVariable int id){
         return eventService.getFeed(id);
-
     }
 }

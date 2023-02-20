@@ -59,7 +59,6 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(query, new FilmMapper());
     }
 
-
     @Override
     public Film findFilmById(int id) {
         String query = BASE_FIND_QUERY + WHERE_ID_CLAUSE + id + GROUP_BY_ID_CLAUSE;
@@ -197,7 +196,6 @@ public class FilmDbStorage implements FilmStorage {
             String sqlQuery = "insert into film_director (film_id,director_id) values (?,?)";
             jdbcTemplate.update(sqlQuery, filmId, directorId);
         }
-
 
     @Override
     public void deleteFilmsDirector(int filmId, int directorId) {

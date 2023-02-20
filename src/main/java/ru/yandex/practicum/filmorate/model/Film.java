@@ -21,7 +21,6 @@ public class Film {
     private final Set<Integer> likes = new HashSet<>();
     private final List<Director> directors = new ArrayList<>();
 
-
     public void addLike(int id) {
         likes.add(id);
     }

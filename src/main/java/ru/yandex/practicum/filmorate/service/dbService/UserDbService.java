@@ -43,11 +43,8 @@ public class UserDbService implements UserService {
 
     @Autowired
     public UserDbService(@Qualifier("UserDbStorage") UserStorage userStorage,
-
                          @Qualifier("FilmDbStorage") FilmStorage filmStorage,
-
                          @Qualifier("EventDbStorage") EventStorage eventStorage,
-
                          @Qualifier("UserDbStorageValidator") UserStorageValidator userStorageValidator,
                          UserValidator userValidator) {
         this.userStorage = userStorage;
@@ -56,7 +53,6 @@ public class UserDbService implements UserService {
         this.userValidator = userValidator;
         this.filmStorage = filmStorage;
     }
-
 
     @Override
     public List<User> getAllUsers() {
