@@ -27,9 +27,9 @@ public class FilmDbStorage implements FilmStorage {
             " (select group_concat(fg.genre_id) from film_genre as fg  where fg.film_id = f.film_id)  as genres_ids," +
             " (select group_concat(g.name) from film_genre as fg inner join genre as g on fg.genre_id=g.genre_id" +
             " where fg.film_id = f.film_id) as genres_names," +
-            " group_concat(fd.director_id)as directors_ids," +
-            " group_concat(d.name) as directors_names," +
-            " group_concat(DISTINCT fl.user_id) as likes" +
+            " group_concat(distinct fd.director_id)as directors_ids," +
+            " group_concat(distinct d.name) as directors_names," +
+            " group_concat(distinct fl.user_id) as likes" +
             " from film as f" +
             " left join mpa as m on f.mpa_id=m.mpa_id" +
             " left join film_likes as fl on f.film_id=fl.film_id" +
