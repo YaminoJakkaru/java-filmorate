@@ -110,7 +110,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<Film> getRecommendFilms(int id) {
-        String query = "SELECT *" +
+        String query = "SELECT * " +
                 "FROM film" +
                 "WHERE film_id IN" +
                 "    (SELECT DISTINCT film_id" +
