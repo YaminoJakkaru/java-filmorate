@@ -139,4 +139,15 @@ public class FilmDbStorage implements FilmStorage {
                 " ORDER BY COUNT(l.film_id) DESC";
         return jdbcTemplate.query(query, new FilmMapper(), userId, friendId);
     }
+
+    @Override
+    public List<Film> getRecommendFilms(int id) {
+        String query = BASE_FIND_QUERY +
+                " WHERE f.film_id IN " +
+                "(SELECT DISTINCT film_id FROM film_likes WHERE film_id NOT IN (SELECT film_id FROM film_likes " +
+                "WHERE user_id = ?) AND user_id IN (SELECT user_id AS _user_id, FROM film_likes WHERE film_id IN " +
+                "(SELECT film_id FROM film_likes WHERE user_id = ?) GROUP BY _user_id ORDER BY COUNT (film_id) DESC " +
+                "LIMIT 10))" + GROUP_BY_ID_CLAUSE;
+        return jdbcTemplate.query(query, new FilmMapper(), id, id);
+    }
 }

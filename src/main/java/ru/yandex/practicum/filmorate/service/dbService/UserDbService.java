@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorageValidator;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
@@ -22,16 +23,19 @@ import java.util.stream.Stream;
 public class UserDbService implements UserService {
 
     private final UserStorage userStorage;
+    private final FilmStorage filmStorage;
     private final UserStorageValidator userStorageValidator;
     private final UserValidator userValidator;
     private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
     public UserDbService(@Qualifier("UserDbStorage") UserStorage userStorage,
+                         @Qualifier("FilmDbStorage") FilmStorage filmStorage,
                          @Qualifier("UserDbStorageValidator") UserStorageValidator userStorageValidator,
                          UserValidator userValidator) {
         this.userStorage = userStorage;
         this.userStorageValidator = userStorageValidator;
         this.userValidator = userValidator;
+        this.filmStorage = filmStorage;
     }
 
 
@@ -97,6 +101,6 @@ public class UserDbService implements UserService {
 
     @Override
     public List<Film> getRecommendFilms(int id) {
-        return userStorage.getRecommendFilms(id);
+        return filmStorage.getRecommendFilms(id);
     }
 }
