@@ -7,9 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.rowMapper.FilmMapper;
 import ru.yandex.practicum.filmorate.rowMapper.UserMapper;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -25,10 +23,6 @@ public class UserDbStorage implements UserStorage {
             + "from users as u  left  join user_friend as uf on u.user_id=uf.user_id";
     private static final String GROUP_BY_ID_CLAUSE = " group by u.user_id ";
     private static final String WHERE_ID_CLAUSE = " where u.user_id in (";
-    private static final String BASE_FILM_FIND_QUERY = "select f.*,m.name as mpa_name, group_concat(fg.genre_id)as genres_ids,"
-            + "group_concat(g.name) as genres_names, group_concat(fl.user_id) as likes from film as f"
-            + " left join mpa as m on f.mpa_id=m.mpa_id left join film_genre as fg on f.film_id=fg.film_id"
-            + " left join genre as g on fg.genre_id=g.genre_id left join film_likes as fl on f.film_id=fl.film_id ";
 
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;

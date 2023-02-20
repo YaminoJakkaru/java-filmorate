@@ -7,12 +7,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
-import ru.yandex.practicum.filmorate.model.*;
-
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.rowMapper.FilmMapper;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -147,7 +145,7 @@ public class FilmDbStorage implements FilmStorage {
                 "(SELECT DISTINCT film_id FROM film_likes WHERE film_id NOT IN (SELECT film_id FROM film_likes " +
                 "WHERE user_id = ?) AND user_id IN (SELECT user_id AS _user_id, FROM film_likes WHERE film_id IN " +
                 "(SELECT film_id FROM film_likes WHERE user_id = ?) GROUP BY _user_id ORDER BY COUNT (film_id) DESC " +
-                "LIMIT 10))" + GROUP_BY_ID_CLAUSE;
+                "))" + GROUP_BY_ID_CLAUSE;
         return jdbcTemplate.query(query, new FilmMapper(), id, id);
     }
 }
