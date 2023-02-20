@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.FilmStorageValidator;
 import ru.yandex.practicum.filmorate.storage.UserStorageValidator;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
@@ -24,6 +25,7 @@ public class FilmDbService implements FilmService {
     private final FilmStorage filmStorage;
     private final EventStorage eventStorage;
     private final UserStorageValidator userStorageValidator;
+    private final FilmStorageValidator filmStorageValidator;
     private final FilmValidator filmValidator;
     private static final Logger LOG = LoggerFactory.getLogger(FilmService.class);
     private static final int LIKE = 1;
@@ -34,10 +36,12 @@ public class FilmDbService implements FilmService {
     public FilmDbService(@Qualifier("FilmDbStorage") FilmStorage filmStorage,
                          @Qualifier("EventDbStorage")EventStorage eventStorage,
                          @Qualifier("UserDbStorageValidator") UserStorageValidator userStorageValidator,
+                         @Qualifier("FilmDbStorageValidator")FilmStorageValidator filmStorageValidator,
                          FilmValidator filmValidator) {
         this.filmStorage = filmStorage;
         this.eventStorage = eventStorage;
         this.userStorageValidator = userStorageValidator;
+        this.filmStorageValidator = filmStorageValidator;
         this.filmValidator = filmValidator;
     }
 
@@ -76,7 +80,11 @@ public class FilmDbService implements FilmService {
             throw new UserNotFoundException();
         }
         eventStorage.createEvent(userId,id,LIKE,ADD);
-        filmStorage.addLike(id, userId);
+        if (!filmStorageValidator.filmLikeValidate(id, userId)) {
+            filmStorage.addLike(id, userId);
+            return;
+        }
+        LOG.warn("Пользователь уже поставил лайк этому фильму");
     }
 
     @Override
