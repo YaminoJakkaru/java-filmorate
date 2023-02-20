@@ -7,16 +7,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.rowMapper.FilmMapper;
 import ru.yandex.practicum.filmorate.rowMapper.UserMapper;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 @Component
 @Qualifier("UserDbStorage")
@@ -88,8 +85,7 @@ public class UserDbStorage implements UserStorage {
     public List<User> getFriends(int id) {
         String queryUser = BASE_FIND_QUERY + WHERE_ID_CLAUSE
                 + " select friend_id from user_friend where user_id=" + id + ")" + GROUP_BY_ID_CLAUSE;
-        List<User> users = jdbcTemplate.query(queryUser, new UserMapper());
-        return users;
+        return jdbcTemplate.query(queryUser, new UserMapper());
     }
 
     @Override
@@ -110,5 +106,29 @@ public class UserDbStorage implements UserStorage {
                 + "from user_friend as uf1  inner join user_friend as uf2 on uf1.friend_id=uf2.friend_id "
                 + " where uf1.user_id=" + id + " and uf2.user_id=" + otherId + ")" + GROUP_BY_ID_CLAUSE;
         return jdbcTemplate.query(query, new UserMapper());
+    }
+
+    @Override
+    public List<Film> getRecommendFilms(int id) {
+        String query = "SELECT *" +
+                "FROM film" +
+                "WHERE film_id IN" +
+                "    (SELECT DISTINCT film_id" +
+                "     FROM film_likes" +
+                "     WHERE film_id NOT IN" +
+                "         (SELECT film_id" +
+                "          FROM film_likes" +
+                "          WHERE user_id = ?)" +
+                "       AND user_id IN" +
+                "         (SELECT user_id AS _user_id," +
+                "          FROM film_likes" +
+                "          WHERE film_id IN" +
+                "              (SELECT film_id" +
+                "               FROM likes" +
+                "               WHERE user_id = ?)" +
+                "          GROUP BY _user_id" +
+                "          ORDER BY COUNT (film_id) DESC" +
+                "          LIMIT 10))";
+        return jdbcTemplate.query(query, new FilmMapper());
     }
 }

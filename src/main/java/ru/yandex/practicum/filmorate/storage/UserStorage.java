@@ -23,4 +23,7 @@ public interface UserStorage {
     void breakFriends(int id, int friendId);
 
     List<User> getMutualFriends(int id, int otherId);
+
+    List<Film> getRecommendFilms(int id);
+
 }

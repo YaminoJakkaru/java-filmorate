@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -23,4 +24,6 @@ public interface UserService {
     void breakFriends(int id, int friendId);
 
     List<User> getMutualFriends(int id, int otherId);
+
+    List<Film> getRecommendFilms(int id);
 }
