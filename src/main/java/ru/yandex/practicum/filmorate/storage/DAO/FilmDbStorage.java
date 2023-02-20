@@ -8,12 +8,10 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
 
 import ru.yandex.practicum.filmorate.rowMapper.FilmMapper;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,9 +27,9 @@ public class FilmDbStorage implements FilmStorage {
             " (select group_concat(fg.genre_id) from film_genre as fg  where fg.film_id = f.film_id)  as genres_ids," +
             " (select group_concat(g.name) from film_genre as fg inner join genre as g on fg.genre_id=g.genre_id" +
             " where fg.film_id = f.film_id) as genres_names," +
-            " group_concat(fd.director_id)as directors_ids," +
-            " group_concat(d.name) as directors_names," +
-            " group_concat(DISTINCT fl.user_id) as likes" +
+            " group_concat(distinct fd.director_id)as directors_ids," +
+            " group_concat(distinct d.name) as directors_names," +
+            " group_concat(distinct fl.user_id) as likes" +
             " from film as f" +
             " left join mpa as m on f.mpa_id=m.mpa_id" +
             " left join film_likes as fl on f.film_id=fl.film_id" +
@@ -40,10 +38,12 @@ public class FilmDbStorage implements FilmStorage {
     private static final String GROUP_BY_ID_CLAUSE = " group by f.film_id ";
     private static final String WHERE_ID_CLAUSE = " where f.film_id= ";
     private static final String ORDER_BY_COUNT_CLAUSE = " order by count(fl.user_id) desc ";
-    private static final String WHERE_DIRECTOR_ID_CLAUSE = " where d.director_id= ";
+    private static final String WHERE_DIRECTOR_ID_CLAUSE = " where d.director_id = ";
     private static final String ORDER_BY_YEAR_CLAUSE = " order by f.release_date ";
     private static final String WHERE_FILM_NAME_CLAUSE = " where lower(f.name) like ";
     private static final String WHERE_DIRECTOR_NAME_CLAUSE = " where lower(d.name) like ";
+    private static final String HAVING_GENRES_IDS_LIKE = " having genres_ids like '%";
+    private static final String WHERE_RELEASE_YEAR_CLAUSE = " where extract(year from f.release_date) = ";
 
     public FilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -135,9 +135,27 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getTopFilms(int count) {
-        String query = BASE_FIND_QUERY + GROUP_BY_ID_CLAUSE + ORDER_BY_COUNT_CLAUSE + " limit " + count;
-        LOG.info("Запрошен топ " + count + " популярных фильмов");
+    public List<Film> getTopFilms(int count, String genreId, String year) {
+        String query = BASE_FIND_QUERY;
+        if ((genreId == null) && (year == null)) {
+            query += GROUP_BY_ID_CLAUSE + ORDER_BY_COUNT_CLAUSE + " limit " + count;
+            LOG.info("Запрошен топ " + count + " популярных фильмов");
+            return jdbcTemplate.query(query, new FilmMapper());
+        }
+        if (year == null) {
+            query += GROUP_BY_ID_CLAUSE + HAVING_GENRES_IDS_LIKE + genreId + "%'" + ORDER_BY_COUNT_CLAUSE +
+                    " limit " + count;;
+            LOG.info("Запрошен топ " + count + " популярных фильмов с жанром id = " + genreId);
+            return jdbcTemplate.query(query, new FilmMapper());
+        }
+        if (genreId == null) {
+            query += WHERE_RELEASE_YEAR_CLAUSE + year + GROUP_BY_ID_CLAUSE;
+            LOG.info("Запрошен топ " + count + " популярных фильмов " + year +  " года");
+            return jdbcTemplate.query(query, new FilmMapper());
+        }
+        LOG.info("Запрошен топ " + count + " популярных фильмов " + year +  " года с жанром id = " + genreId);
+        query += WHERE_RELEASE_YEAR_CLAUSE + year + GROUP_BY_ID_CLAUSE + HAVING_GENRES_IDS_LIKE + genreId + "%'" +
+                ORDER_BY_COUNT_CLAUSE + " limit " + count;
         return jdbcTemplate.query(query, new FilmMapper());
     }
 

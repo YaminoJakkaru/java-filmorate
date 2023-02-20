@@ -1,4 +1,4 @@
-
+drop all objects ;
 CREATE TABLE IF NOT EXISTS mpa
 (
     mpa_id int PRIMARY KEY,
