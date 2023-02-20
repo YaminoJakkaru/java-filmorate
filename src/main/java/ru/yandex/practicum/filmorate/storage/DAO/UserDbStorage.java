@@ -129,6 +129,6 @@ public class UserDbStorage implements UserStorage {
                 "          GROUP BY _user_id " +
                 "          ORDER BY COUNT (film_id) DESC " +
                 "          LIMIT 10))";
-        return jdbcTemplate.query(query, new FilmMapper());
+        return jdbcTemplate.query(query, new FilmMapper(), id, id);
     }
 }
