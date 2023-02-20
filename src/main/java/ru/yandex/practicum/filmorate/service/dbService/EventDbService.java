@@ -29,7 +29,6 @@ public class EventDbService implements EventService {
         this.userStorageValidator = userStorageValidator;
     }
 
-
     @Override
     public List<Event> getFeed(int id) {
         if (!userStorageValidator.userIdValidate(id)) {

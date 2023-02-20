@@ -8,6 +8,7 @@ public interface DirectorStorage {
     Director createDirector(Director director);
 
     Director findDirectorById(int id);
+
     List<Director> getAllDirectors();
 
     Director changeDirector(Director director);

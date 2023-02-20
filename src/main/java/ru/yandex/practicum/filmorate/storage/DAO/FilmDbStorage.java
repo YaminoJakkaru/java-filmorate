@@ -7,9 +7,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.*;
-
 import ru.yandex.practicum.filmorate.rowMapper.FilmMapper;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -57,7 +58,6 @@ public class FilmDbStorage implements FilmStorage {
         String query = BASE_FIND_QUERY + GROUP_BY_ID_CLAUSE;
         return jdbcTemplate.query(query, new FilmMapper());
     }
-
 
     @Override
     public Film findFilmById(int id) {
@@ -172,10 +172,30 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public void addFilmsDirector(int filmId, int directorId) {
-        String sqlQuery = "insert into film_director (film_id,director_id) values (?,?)";
-        jdbcTemplate.update(sqlQuery, filmId, directorId);
+    public List<Film> getCommonFilms(int userId, int friendId) {
+        String query = BASE_FIND_QUERY +
+                " LEFT JOIN film_likes l on f.film_id = l.film_id" +
+                " WHERE f.film_id IN (SELECT DISTINCT sf.film_id FROM (SELECT film_likes.film_id FROM film_likes WHERE user_id = ?) AS ff" +
+                " INNER JOIN (SELECT film_likes.film_id FROM film_likes WHERE user_id = ?) AS sf ON ff.film_id = sf.film_id)" +
+                " GROUP BY f.film_id" +
+                " ORDER BY COUNT(l.film_id) DESC";
+        return jdbcTemplate.query(query, new FilmMapper(), userId, friendId);
     }
+
+    @Override
+    public List<Film> getRecommendFilms(int id) {
+        String query = BASE_FIND_QUERY +
+                " WHERE f.film_id IN " +
+                "(SELECT DISTINCT film_id FROM film_likes WHERE film_id NOT IN (SELECT film_id FROM film_likes " +
+                "WHERE user_id = ?) AND user_id IN (SELECT user_id  FROM film_likes WHERE film_id IN " +
+                "(SELECT film_id FROM film_likes WHERE user_id = ?) GROUP BY user_id ORDER BY COUNT (film_id) DESC " +
+                "))" + GROUP_BY_ID_CLAUSE;
+        return jdbcTemplate.query(query, new FilmMapper(), id, id);
+    }
+        public void addFilmsDirector ( int filmId, int directorId){
+            String sqlQuery = "insert into film_director (film_id,director_id) values (?,?)";
+            jdbcTemplate.update(sqlQuery, filmId, directorId);
+        }
 
     @Override
     public void deleteFilmsDirector(int filmId, int directorId) {

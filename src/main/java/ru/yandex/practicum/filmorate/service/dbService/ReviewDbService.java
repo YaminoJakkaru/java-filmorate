@@ -95,7 +95,6 @@ public class ReviewDbService implements ReviewService {
         LOG.warn("Пользователь уже поставил лайк этому отзыву");
     }
 
-
     public void addDislike(int id, int userId) {
         if (!userStorageValidator.userIdValidate(userId)) {
             LOG.warn("Пользователь не найден");
@@ -107,7 +106,6 @@ public class ReviewDbService implements ReviewService {
         }
         LOG.warn("Пользователь уже поставил дизлайк этому отзыву");
     }
-
 
     public void deleteLike(int id, int userId) {
         if (!userStorageValidator.userIdValidate(userId)) {
@@ -121,7 +119,6 @@ public class ReviewDbService implements ReviewService {
         LOG.warn("Пользователь не ставил лайк этому отзыву");
     }
 
-
     public void deleteDislike(int id, int userId) {
         if (!userStorageValidator.userIdValidate(userId)) {
             LOG.warn("Пользователь не найден");
@@ -133,5 +130,4 @@ public class ReviewDbService implements ReviewService {
         }
         LOG.warn("Пользователь не ставил дизлайк этому отзыву");
     }
-
 }

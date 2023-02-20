@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 public interface UserStorage {
 
@@ -21,7 +23,6 @@ public interface UserStorage {
     void breakFriends(int id, int friendId);
 
     List<User> getMutualFriends(int id, int otherId);
-
-
+    
     void deleteUser(int id);
 }

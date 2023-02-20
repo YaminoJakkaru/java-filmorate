@@ -7,11 +7,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.rowMapper.UserMapper;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.util.List;
 
@@ -85,8 +83,7 @@ public class UserDbStorage implements UserStorage {
     public List<User> getFriends(int id) {
         String queryUser = BASE_FIND_QUERY + WHERE_ID_CLAUSE
                 + " select friend_id from user_friend where user_id=" + id + ")" + GROUP_BY_ID_CLAUSE;
-        List<User> users = jdbcTemplate.query(queryUser, new UserMapper());
-        return users;
+        return jdbcTemplate.query(queryUser, new UserMapper());
     }
 
     @Override
