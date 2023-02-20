@@ -115,7 +115,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<Film> getRecommendFilms(int id) {
         String query = BASE_FILM_FIND_QUERY +
-                " WHERE film_id IN " +
+                " WHERE f.film_id IN " +
                 "    (SELECT DISTINCT film_id " +
                 "     FROM film_likes " +
                 "     WHERE film_id NOT IN " +
@@ -131,7 +131,7 @@ public class UserDbStorage implements UserStorage {
                 "               WHERE user_id = ?) " +
                 "          GROUP BY _user_id " +
                 "          ORDER BY COUNT (film_id) DESC " +
-                "          LIMIT 10))";
+                "          LIMIT 10)) group by f.film_id";
         return jdbcTemplate.query(query, new FilmMapper(), id, id);
     }
 }
