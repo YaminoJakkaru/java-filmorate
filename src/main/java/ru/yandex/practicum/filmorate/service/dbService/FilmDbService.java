@@ -10,7 +10,9 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.rowMapper.FilmMapper;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.FilmStorageValidator;
 import ru.yandex.practicum.filmorate.storage.UserStorageValidator;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
@@ -22,17 +24,25 @@ import java.util.List;
 public class FilmDbService implements FilmService {
 
     private final FilmStorage filmStorage;
+    private final EventStorage eventStorage;
     private final UserStorageValidator userStorageValidator;
-
+    private final FilmStorageValidator filmStorageValidator;
     private final FilmValidator filmValidator;
     private static final Logger LOG = LoggerFactory.getLogger(FilmService.class);
+    private static final int LIKE = 1;
+    private static final int REMOVE = 1;
+    private static final int ADD = 2;
 
     @Autowired
     public FilmDbService(@Qualifier("FilmDbStorage") FilmStorage filmStorage,
+                         @Qualifier("EventDbStorage")EventStorage eventStorage,
                          @Qualifier("UserDbStorageValidator") UserStorageValidator userStorageValidator,
+                         @Qualifier("FilmDbStorageValidator")FilmStorageValidator filmStorageValidator,
                          FilmValidator filmValidator) {
         this.filmStorage = filmStorage;
+        this.eventStorage = eventStorage;
         this.userStorageValidator = userStorageValidator;
+        this.filmStorageValidator = filmStorageValidator;
         this.filmValidator = filmValidator;
     }
 
@@ -70,7 +80,12 @@ public class FilmDbService implements FilmService {
             LOG.warn("Пользователь не найден");
             throw new UserNotFoundException();
         }
-        filmStorage.addLike(id, userId);
+        eventStorage.createEvent(userId,id,LIKE,ADD);
+        if (!filmStorageValidator.filmLikeValidate(id, userId)) {
+            filmStorage.addLike(id, userId);
+            return;
+        }
+        LOG.warn("Пользователь уже поставил лайк этому фильму");
     }
 
     @Override
@@ -79,12 +94,28 @@ public class FilmDbService implements FilmService {
             LOG.warn("Пользователь не найден");
             throw new UserNotFoundException();
         }
+        eventStorage.createEvent(userId,id,LIKE,REMOVE);
         filmStorage.deleteLike(id, userId);
     }
 
     @Override
-    public List<Film> getTopFilms(int count) {
-        return filmStorage.getTopFilms(count);
+    public List<Film> getTopFilms(int count, String genreId, String year) {
+        return filmStorage.getTopFilms(count, genreId, year);
+    }
+
+    @Override
+    public List<Film> getDirectorFilms(int directorId, String sortBy) {
+        return filmStorage.getDirectorFilms(directorId, sortBy);
+    }
+
+    @Override
+    public List<Film> getSearchedFilms(String searchQuery, String searchSource) {
+        return filmStorage.getSearchedFilms(searchQuery, searchSource);
+    }
+
+    @Override
+    public void deleteFilm(int id) {
+        filmStorage.deleteFilm(id);
     }
 
     @Override

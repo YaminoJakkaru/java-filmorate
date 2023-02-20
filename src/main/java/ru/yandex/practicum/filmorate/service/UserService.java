@@ -25,5 +25,9 @@ public interface UserService {
 
     List<User> getMutualFriends(int id, int otherId);
 
+
     List<Film> getRecommendFilms(int id);
+
+    void deleteUser(int id);
+
 }
