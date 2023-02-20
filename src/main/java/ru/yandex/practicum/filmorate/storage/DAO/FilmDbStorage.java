@@ -137,19 +137,25 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getTopFilms(int count, String genreId, String year) {
         String query = BASE_FIND_QUERY;
-        if ((genreId != null) && (year != null)) {
-            query += WHERE_RELEASE_YEAR_CLAUSE + year + GROUP_BY_ID_CLAUSE + HAVING_GENRES_IDS_LIKE + genreId + "%' ";
-            LOG.info("Запрошен топ " + count + " популярных фильмов " + year +  " года с жанром id = " + genreId);
-        } else if (genreId != null) {
-            query += GROUP_BY_ID_CLAUSE + HAVING_GENRES_IDS_LIKE + genreId + "%' ";
+        if ((genreId == null) && (year == null)) {
+            query += GROUP_BY_ID_CLAUSE + ORDER_BY_COUNT_CLAUSE + " limit " + count;
+            LOG.info("Запрошен топ " + count + " популярных фильмов");
+            return jdbcTemplate.query(query, new FilmMapper());
+        }
+        if (year == null) {
+            query += GROUP_BY_ID_CLAUSE + HAVING_GENRES_IDS_LIKE + genreId + "%'" + ORDER_BY_COUNT_CLAUSE +
+                    " limit " + count;;
             LOG.info("Запрошен топ " + count + " популярных фильмов с жанром id = " + genreId);
-        } else if (year != null) {
+            return jdbcTemplate.query(query, new FilmMapper());
+        }
+        if (genreId == null) {
             query += WHERE_RELEASE_YEAR_CLAUSE + year + GROUP_BY_ID_CLAUSE;
             LOG.info("Запрошен топ " + count + " популярных фильмов " + year +  " года");
-        } else {
-            query += GROUP_BY_ID_CLAUSE;
+            return jdbcTemplate.query(query, new FilmMapper());
         }
-        query += ORDER_BY_COUNT_CLAUSE + " limit " + count;
+        LOG.info("Запрошен топ " + count + " популярных фильмов " + year +  " года с жанром id = " + genreId);
+        query += WHERE_RELEASE_YEAR_CLAUSE + year + GROUP_BY_ID_CLAUSE + HAVING_GENRES_IDS_LIKE + genreId + "%'" +
+                ORDER_BY_COUNT_CLAUSE + " limit " + count;
         return jdbcTemplate.query(query, new FilmMapper());
     }
 
