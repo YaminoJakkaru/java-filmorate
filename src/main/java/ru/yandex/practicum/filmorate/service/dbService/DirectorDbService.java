@@ -14,7 +14,6 @@ import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import java.util.List;
 
 @Service
-@Qualifier("DirectorDbService")
 public class DirectorDbService implements DirectorService {
     private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
     private final DirectorStorage directorStorage;

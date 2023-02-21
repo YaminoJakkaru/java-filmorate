@@ -12,7 +12,7 @@ import java.util.List;
 public class DirectorController {
     private final DirectorService directorService;
 
-    public DirectorController(@Qualifier("DirectorDbService") DirectorService directorService) {
+    public DirectorController( DirectorService directorService) {
         this.directorService = directorService;
     }
 

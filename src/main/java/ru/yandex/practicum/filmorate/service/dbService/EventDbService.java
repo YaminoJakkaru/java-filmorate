@@ -16,7 +16,6 @@ import java.util.List;
 
 
 @Service
-@Qualifier("EventDbService")
 public class EventDbService implements EventService {
     private final EventStorage eventStorage;
     private final UserStorageValidator userStorageValidator;

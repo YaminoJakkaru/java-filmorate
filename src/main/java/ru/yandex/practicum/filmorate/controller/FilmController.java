@@ -20,7 +20,7 @@ public class FilmController {
     private final FilmService filmService;
 
     @Autowired
-    public FilmController(@Qualifier("FilmDbService") FilmService filmService) {
+    public FilmController( FilmService filmService) {
         this.filmService = filmService;
     }
 

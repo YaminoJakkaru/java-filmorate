@@ -19,7 +19,7 @@ public class DirectorDbStorage implements DirectorStorage {
     private static final Logger LOG = LoggerFactory.getLogger(DirectorStorage.class);
 
     private final JdbcTemplate jdbcTemplate;
-    SimpleJdbcInsert simpleJdbcInsertDirector;
+    private final SimpleJdbcInsert simpleJdbcInsertDirector;
 
     public DirectorDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;

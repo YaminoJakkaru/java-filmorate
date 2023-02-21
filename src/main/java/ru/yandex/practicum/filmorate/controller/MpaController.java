@@ -19,7 +19,7 @@ public class MpaController {
     private final MpaService mpaService;
 
     @Autowired
-    public MpaController(@Qualifier("MpaDbService") MpaService mpaService) {
+    public MpaController(MpaService mpaService) {
         this.mpaService = mpaService;
     }
 

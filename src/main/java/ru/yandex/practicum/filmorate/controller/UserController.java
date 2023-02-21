@@ -22,8 +22,8 @@ public class UserController {
     private final EventService eventService;
 
     @Autowired
-    public UserController(@Qualifier("UserDbService") UserService userService,
-                          @Qualifier("EventDbService") EventService eventService) {
+    public UserController(UserService userService,
+                          EventService eventService) {
         this.userService = userService;
         this.eventService = eventService;
     }

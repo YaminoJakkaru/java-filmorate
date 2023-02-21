@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.enums.EntityType;
+import ru.yandex.practicum.filmorate.enums.EventType;
+import ru.yandex.practicum.filmorate.enums.Operation;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
@@ -19,7 +22,6 @@ import ru.yandex.practicum.filmorate.validator.ReviewValidator;
 import java.util.List;
 
 @Service
-@Qualifier("ReviewDbService")
 public class ReviewDbService implements ReviewService {
 
     private final ReviewStorage reviewStorage;
@@ -28,10 +30,6 @@ public class ReviewDbService implements ReviewService {
     private final UserStorageValidator userStorageValidator;
     private final ReviewStorageValidator reviewStorageValidator;
     private static final Logger LOG = LoggerFactory.getLogger(ReviewService.class);
-    private static final int REVIEW = 2;
-    private static final int REMOVE = 1;
-    private static final int ADD = 2;
-    private static final int UPDATE = 3;
 
     @Autowired
     public ReviewDbService(@Qualifier("ReviewDbStorage") ReviewStorage reviewStorage,
@@ -55,9 +53,10 @@ public class ReviewDbService implements ReviewService {
             LOG.warn("Валидация отзыва не пройдена");
             throw new NotFoundException();
         }
-        review=reviewStorage.createReview(review);
-        eventStorage.createEvent(review.getUserId(), review.getReviewId(), REVIEW,ADD);
-        return review;
+        Review createdReview = reviewStorage.createReview(review);
+        eventStorage.createEvent(createdReview.getUserId(), createdReview.getReviewId(),
+                EntityType.REVIEW, EventType.REVIEW,Operation.ADD);
+        return createdReview;
     }
 
     public Review changeReview(Review review) {
@@ -65,13 +64,16 @@ public class ReviewDbService implements ReviewService {
             LOG.warn("Пользователь не найден");
             throw new ValidationException();
         }
-        review=reviewStorage.changeReview(review);
-        eventStorage.createEvent(review.getUserId(), review.getReviewId(), REVIEW,UPDATE);
-        return review;
+        Review createdReview =reviewStorage.changeReview(review);
+        eventStorage.createEvent(createdReview.getUserId(), createdReview.getReviewId(),
+                EntityType.REVIEW, EventType.REVIEW,Operation.UPDATE);
+        return createdReview;
     }
 
     public void breakReview(int id) {
-        eventStorage.createEvent(reviewStorage.getReviewAuthorId(id), id, REVIEW,REMOVE);
+        eventStorage.createEvent(reviewStorage.getReviewAuthorId(id), id,
+                EntityType.REVIEW, EventType.REVIEW,Operation.REMOVE);
+
         reviewStorage.breakReview(id);
     }
 

@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
+import ru.yandex.practicum.filmorate.enums.EntityType;
+import ru.yandex.practicum.filmorate.enums.EventType;
+import ru.yandex.practicum.filmorate.enums.Operation;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -24,7 +27,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Service
-@Qualifier("UserDbService")
 public class UserDbService implements UserService {
 
     private final UserStorage userStorage;
@@ -37,9 +39,6 @@ public class UserDbService implements UserService {
     private final UserStorageValidator userStorageValidator;
     private final UserValidator userValidator;
     private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
-    private static final int FRIEND = 3;
-    private static final int REMOVE = 1;
-    private static final int ADD = 2;
 
     @Autowired
     public UserDbService(@Qualifier("UserDbStorage") UserStorage userStorage,
@@ -97,7 +96,7 @@ public class UserDbService implements UserService {
             LOG.warn("Пользователь не найден");
             throw new UserNotFoundException();
         }
-        eventStorage.createEvent(id,friendId,FRIEND,ADD);
+        eventStorage.createEvent(id,friendId, EntityType.USER, EventType.FRIEND, Operation.ADD);
         userStorage.makeFriends(id, friendId);
     }
 
@@ -107,7 +106,7 @@ public class UserDbService implements UserService {
             LOG.warn("Пользователь не найден");
             throw new UserNotFoundException();
         }
-        eventStorage.createEvent(id,friendId,FRIEND,REMOVE);
+        eventStorage.createEvent(id,friendId, EntityType.USER, EventType.FRIEND, Operation.REMOVE);
         userStorage.breakFriends(id, friendId);
     }
 

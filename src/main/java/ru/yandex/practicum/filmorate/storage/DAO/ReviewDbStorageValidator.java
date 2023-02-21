@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.ReviewStorageValidator;
 public class ReviewDbStorageValidator implements ReviewStorageValidator {
 
     private final JdbcTemplate jdbcTemplate;
+    private static final int REQUIRED_QUANTITY = 2;
 
     public ReviewDbStorageValidator(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -33,6 +34,6 @@ public class ReviewDbStorageValidator implements ReviewStorageValidator {
     public boolean checkUserFilmValidate(int userId, int film_id) {
         String queryCheck = "select count(select user_id from users where user_id = " + userId +
                 ") + count(select film_id from film where film_id = " + film_id + ")";
-        return jdbcTemplate.queryForObject(queryCheck, Integer.class) == 2;
+        return jdbcTemplate.queryForObject(queryCheck, Integer.class) == REQUIRED_QUANTITY;
     }
 }

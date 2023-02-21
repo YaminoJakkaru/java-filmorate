@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.enums.EntityType;
+import ru.yandex.practicum.filmorate.enums.EventType;
+import ru.yandex.practicum.filmorate.enums.Operation;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -20,7 +23,6 @@ import ru.yandex.practicum.filmorate.validator.FilmValidator;
 import java.util.List;
 
 @Service
-@Qualifier("FilmDbService")
 public class FilmDbService implements FilmService {
 
     private final FilmStorage filmStorage;
@@ -29,9 +31,6 @@ public class FilmDbService implements FilmService {
     private final FilmStorageValidator filmStorageValidator;
     private final FilmValidator filmValidator;
     private static final Logger LOG = LoggerFactory.getLogger(FilmService.class);
-    private static final int LIKE = 1;
-    private static final int REMOVE = 1;
-    private static final int ADD = 2;
 
     @Autowired
     public FilmDbService(@Qualifier("FilmDbStorage") FilmStorage filmStorage,
@@ -80,7 +79,7 @@ public class FilmDbService implements FilmService {
             LOG.warn("Пользователь не найден");
             throw new UserNotFoundException();
         }
-        eventStorage.createEvent(userId,id,LIKE,ADD);
+        eventStorage.createEvent(userId,id, EntityType.FILM, EventType.LIKE, Operation.ADD);
         if (!filmStorageValidator.filmLikeValidate(id, userId)) {
             filmStorage.addLike(id, userId);
             return;
@@ -94,7 +93,7 @@ public class FilmDbService implements FilmService {
             LOG.warn("Пользователь не найден");
             throw new UserNotFoundException();
         }
-        eventStorage.createEvent(userId,id,LIKE,REMOVE);
+        eventStorage.createEvent(userId,id, EntityType.FILM, EventType.LIKE, Operation.REMOVE);
         filmStorage.deleteLike(id, userId);
     }
 
