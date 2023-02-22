@@ -55,7 +55,7 @@ public class ReviewDbStorage implements ReviewStorage {
             throw new NotFoundException();
         }
         LOG.info("Данные отзыва изменены");
-        return review;
+        return findReviewById(review.getReviewId());
     }
 
     @Override

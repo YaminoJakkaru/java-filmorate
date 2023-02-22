@@ -74,7 +74,7 @@ public class UserDbStorage implements UserStorage {
             throw new UserNotFoundException();
         }
         LOG.info("Данные пользователя обновлен");
-        return user;
+        return findUserById(user.getId());
     }
 
     @Override
