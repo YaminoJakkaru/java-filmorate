@@ -17,10 +17,10 @@ public class UserDbStorage implements UserStorage {
     private static final Logger LOG = LoggerFactory.getLogger(UserStorage.class);
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsertUser;
-    private static final String BASE_FIND_QUERY = "select u.*,group_concat(uf.friend_id) as friends "
-            + "from users as u  left  join user_friend as uf on u.user_id=uf.user_id";
+    private static final String BASE_FIND_QUERY = "select u.*,group_concat(uf.friend_id) as friends " +
+            "from users as u  left  join user_friend as uf on u.user_id=uf.user_id";
     private static final String GROUP_BY_ID_CLAUSE = " group by u.user_id ";
-    private static final String WHERE_ID_CLAUSE = " where u.user_id in (";
+    private static final String WHERE_ID_CLAUSE = " where u.user_id=?";
 
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -40,8 +40,8 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User findUserById(int id) {
 
-        String query = BASE_FIND_QUERY + WHERE_ID_CLAUSE + id + ")" + GROUP_BY_ID_CLAUSE;
-        List<User> users = jdbcTemplate.query(query, UserMapper.INSTANCE);
+        String query = BASE_FIND_QUERY + WHERE_ID_CLAUSE + GROUP_BY_ID_CLAUSE;
+        List<User> users = jdbcTemplate.query(query, UserMapper.INSTANCE, id);
         if (users.isEmpty()) {
             LOG.warn("Попытка  получить несуществующего пользователя");
             throw new UserNotFoundException();
@@ -79,9 +79,9 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getFriends(int id) {
-        String queryUser = BASE_FIND_QUERY + WHERE_ID_CLAUSE
-                + " select friend_id from user_friend where user_id=" + id + ")" + GROUP_BY_ID_CLAUSE;
-        return jdbcTemplate.query(queryUser, UserMapper.INSTANCE);
+        String queryUser = BASE_FIND_QUERY + " right join user_friend as uf1 on u.user_id=uf1.friend_id "
+                + "where uf1.user_id=?" + GROUP_BY_ID_CLAUSE;
+        return jdbcTemplate.query(queryUser, UserMapper.INSTANCE, id);
     }
 
     @Override
@@ -98,10 +98,10 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getMutualFriends(int id, int otherId) {
-        String query = BASE_FIND_QUERY + WHERE_ID_CLAUSE + " select uf1.friend_id "
-                + "from user_friend as uf1  inner join user_friend as uf2 on uf1.friend_id=uf2.friend_id "
-                + " where uf1.user_id=" + id + " and uf2.user_id=" + otherId + ")" + GROUP_BY_ID_CLAUSE;
-        return jdbcTemplate.query(query, UserMapper.INSTANCE);
+        String query = BASE_FIND_QUERY + " right join user_friend as uf1 on u.user_id=uf1.friend_id " +
+                "left join user_friend as uf2 on uf1.friend_id=uf2.friend_id  " +
+                "where uf1.user_id=? and uf2.user_id=?" + GROUP_BY_ID_CLAUSE;
+        return jdbcTemplate.query(query, UserMapper.INSTANCE, id, otherId);
     }
 
     @Override
