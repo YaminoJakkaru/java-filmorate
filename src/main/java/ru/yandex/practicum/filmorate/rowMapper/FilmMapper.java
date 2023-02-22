@@ -34,9 +34,7 @@ public enum FilmMapper implements RowMapper<Film> {
             String[] genreIds = resultSet.getString("genres_ids").split(",");
             String[] genreNames = resultSet.getString("genres_names").split(",");
             for (int i = 0; i < genreIds.length; i++) {
-                if(i==0||!genreIds[i-1].equals(genreIds[i])) {
                     film.addGenres(Genre.builder().id(Integer.parseInt(genreIds[i])).name(genreNames[i]).build());
-                }
             }
         }
         if (resultSet.getString("likes") != null) {
