@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage.DAO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
@@ -116,7 +115,7 @@ public class FilmDbStorage implements FilmStorage {
             throw new FilmNotFoundException();
         }
         LOG.info("Данные фильма изменены");
-        return film;
+        return findFilmById(film.getId());
     }
 
     @Override
