@@ -28,9 +28,8 @@ public class FilmMapper implements RowMapper<Film> {
                 .build();
         if (resultSet.getString("genres_ids") != null) {
             String[] genreIds = resultSet.getString("genres_ids").split(",");
-            String[] genreNames = resultSet.getString("genres_names").split(",");
             for (int i = 0; i < genreIds.length; i++) {
-                film.addGenres(Genre.builder().id(Integer.parseInt(genreIds[i])).name(genreNames[i]).build());
+                film.addGenres(getGenreById(genreIds[i]));
             }
         }
         if (resultSet.getString("likes") != null) {
@@ -45,5 +44,24 @@ public class FilmMapper implements RowMapper<Film> {
             }
         }
         return film;
+    }
+
+    private Genre getGenreById(String genreId) {
+        switch (genreId) {
+            case "1":
+                return new Genre(1, "Комедия");
+            case "2":
+                return new Genre(2, "Драма");
+            case "3":
+                return new Genre(3, "Мультфильм");
+            case "4":
+                return new Genre(4, "Триллер");
+            case "5":
+                return new Genre(5, "Документальный");
+            case "6":
+                return new Genre(6, "Боевик");
+            default:
+                return null;
+        }
     }
 }
