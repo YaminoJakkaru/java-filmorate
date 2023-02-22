@@ -7,9 +7,12 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-@Component
-public class MpaMapper implements RowMapper<Mpa> {
 
+public enum MpaMapper implements RowMapper<Mpa> {
+    INSTANCE;
+    public static MpaMapper getInstance() {
+        return INSTANCE;
+    }
     @Override
     public Mpa mapRow(ResultSet resultSet, int rowNum) throws SQLException {
         return Mpa.builder()

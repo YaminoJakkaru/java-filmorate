@@ -10,10 +10,14 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Objects;
 
-@Component
-public class FilmMapper implements RowMapper<Film> {
 
+public enum FilmMapper implements RowMapper<Film> {
+    INSTANCE;
+    public static FilmMapper getInstance() {
+        return INSTANCE;
+    }
     @Override
     public Film mapRow(ResultSet resultSet, int rowNum) throws SQLException {
         Film film = Film.builder()
@@ -30,7 +34,9 @@ public class FilmMapper implements RowMapper<Film> {
             String[] genreIds = resultSet.getString("genres_ids").split(",");
             String[] genreNames = resultSet.getString("genres_names").split(",");
             for (int i = 0; i < genreIds.length; i++) {
-                film.addGenres(Genre.builder().id(Integer.parseInt(genreIds[i])).name(genreNames[i]).build());
+                if(i==0||!genreIds[i-1].equals(genreIds[i])) {
+                    film.addGenres(Genre.builder().id(Integer.parseInt(genreIds[i])).name(genreNames[i]).build());
+                }
             }
         }
         if (resultSet.getString("likes") != null) {

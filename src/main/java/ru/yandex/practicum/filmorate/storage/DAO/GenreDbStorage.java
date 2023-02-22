@@ -24,7 +24,7 @@ public class GenreDbStorage implements GenreStorage {
     @Override
     public Genre findGenreById(int id) {
         String query = "select * from genre where genre_id=" + id;
-        List<Genre> genres = jdbcTemplate.query(query, new GenreMapper());
+        List<Genre> genres = jdbcTemplate.query(query,GenreMapper.INSTANCE);
         if (genres.isEmpty()) {
             LOG.warn("Попытка  получить несуществующий жанр");
             throw new NotFoundException();
@@ -35,6 +35,6 @@ public class GenreDbStorage implements GenreStorage {
     @Override
     public List<Genre> getAllGenre() {
         String query = "select * from genre";
-        return jdbcTemplate.query(query, new GenreMapper());
+        return jdbcTemplate.query(query, GenreMapper.INSTANCE);
     }
 }

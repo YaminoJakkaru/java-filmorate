@@ -31,6 +31,6 @@ public class EventDbStorage implements EventStorage {
     @Override
     public List<Event> getFeed(int userId) {
         String query = "select * from event  where user_id=" + userId + " order by created_at asc";
-        return jdbcTemplate.query(query, new EventMapper());
+        return jdbcTemplate.query(query, EventMapper.INSTANCE);
     }
 }

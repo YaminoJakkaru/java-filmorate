@@ -7,8 +7,13 @@ import ru.yandex.practicum.filmorate.model.Review;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-@Component
-public class ReviewMapper implements RowMapper<Review> {
+
+public enum ReviewMapper implements RowMapper<Review> {
+
+    INSTANCE;
+    public static ReviewMapper getInstance() {
+        return INSTANCE;
+    }
     @Override
     public Review mapRow(ResultSet resultSet, int rowNum) throws SQLException {
         return Review.builder()

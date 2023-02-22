@@ -24,7 +24,7 @@ public class MpaDbStorage implements MpaStorage {
     @Override
     public Mpa findMpaById(int id) {
         String query = "select * from mpa where mpa_id=" + id;
-        List<Mpa> mpa = jdbcTemplate.query(query, new MpaMapper());
+        List<Mpa> mpa = jdbcTemplate.query(query, MpaMapper.INSTANCE);
         if (mpa.isEmpty()) {
             LOG.warn("Попытка  получить несуществующий рейтинг");
             throw new NotFoundException();
@@ -35,6 +35,6 @@ public class MpaDbStorage implements MpaStorage {
     @Override
     public List<Mpa> getAllMpa() {
         String query = "select * from mpa";
-        return jdbcTemplate.query(query, new MpaMapper());
+        return jdbcTemplate.query(query, MpaMapper.INSTANCE);
     }
 }

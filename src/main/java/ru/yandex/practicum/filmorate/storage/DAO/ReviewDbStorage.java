@@ -67,7 +67,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public Review findReviewById(int id) {
         String query = BASE_FIND_QUERY + "where r.review_id = " + id + " group by r.review_id";
-        List<Review> reviews = jdbcTemplate.query(query, new ReviewMapper());
+        List<Review> reviews = jdbcTemplate.query(query, ReviewMapper.INSTANCE);
         if (reviews.isEmpty()) {
             LOG.warn("Попытка  получить несуществующий отзыв");
             throw new NotFoundException();
@@ -80,10 +80,10 @@ public class ReviewDbStorage implements ReviewStorage {
         if (filmId != 0) {
             String query = BASE_FIND_QUERY + "where film_id = ? group by r.review_id " +
                            "order by useful DESC, review_id ASC fetch first ? rows only";
-            return jdbcTemplate.query(query, new ReviewMapper(), filmId, count);
+            return jdbcTemplate.query(query, ReviewMapper.INSTANCE, filmId, count);
         }
         String query = BASE_FIND_QUERY + " group by r.review_id order by useful DESC, review_id ASC fetch first ? rows only";
-        return jdbcTemplate.query(query, new ReviewMapper(), count);
+        return jdbcTemplate.query(query, ReviewMapper.INSTANCE, count);
     }
 
     @Override

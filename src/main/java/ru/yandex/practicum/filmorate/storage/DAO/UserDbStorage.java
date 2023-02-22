@@ -32,7 +32,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getAllUsers() {
         String queryUser = BASE_FIND_QUERY + GROUP_BY_ID_CLAUSE;
-        List<User> users = jdbcTemplate.query(queryUser, new UserMapper());
+        List<User> users = jdbcTemplate.query(queryUser, UserMapper.INSTANCE);
         LOG.info("Запрошен список пользователей");
         return users;
     }
@@ -41,7 +41,7 @@ public class UserDbStorage implements UserStorage {
     public User findUserById(int id) {
 
         String query = BASE_FIND_QUERY + WHERE_ID_CLAUSE + id + ")" + GROUP_BY_ID_CLAUSE;
-        List<User> users = jdbcTemplate.query(query, new UserMapper());
+        List<User> users = jdbcTemplate.query(query, UserMapper.INSTANCE);
         if (users.isEmpty()) {
             LOG.warn("Попытка  получить несуществующего пользователя");
             throw new UserNotFoundException();
@@ -81,7 +81,7 @@ public class UserDbStorage implements UserStorage {
     public List<User> getFriends(int id) {
         String queryUser = BASE_FIND_QUERY + WHERE_ID_CLAUSE
                 + " select friend_id from user_friend where user_id=" + id + ")" + GROUP_BY_ID_CLAUSE;
-        return jdbcTemplate.query(queryUser, new UserMapper());
+        return jdbcTemplate.query(queryUser, UserMapper.INSTANCE);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class UserDbStorage implements UserStorage {
         String query = BASE_FIND_QUERY + WHERE_ID_CLAUSE + " select uf1.friend_id "
                 + "from user_friend as uf1  inner join user_friend as uf2 on uf1.friend_id=uf2.friend_id "
                 + " where uf1.user_id=" + id + " and uf2.user_id=" + otherId + ")" + GROUP_BY_ID_CLAUSE;
-        return jdbcTemplate.query(query, new UserMapper());
+        return jdbcTemplate.query(query, UserMapper.INSTANCE);
     }
 
     @Override

@@ -8,8 +8,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-@Component
-public class UserMapper implements RowMapper<User> {
+
+public enum UserMapper implements RowMapper<User> {
+
+    INSTANCE;
+    public static UserMapper getInstance() {
+        return INSTANCE;
+    }
 
     @Override
     public User mapRow(ResultSet resultSet, int rowNum) throws SQLException {

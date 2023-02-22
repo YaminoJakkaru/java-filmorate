@@ -7,7 +7,12 @@ import ru.yandex.practicum.filmorate.model.Event;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class EventMapper implements RowMapper<Event> {
+public enum EventMapper implements RowMapper<Event> {
+
+    INSTANCE;
+    public static EventMapper getInstance() {
+        return INSTANCE;
+    }
     @Override
     public Event mapRow(ResultSet resultSet, int rowNum) throws SQLException {
         return Event.builder()

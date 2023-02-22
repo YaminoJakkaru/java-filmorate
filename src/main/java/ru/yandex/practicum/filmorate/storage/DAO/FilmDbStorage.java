@@ -54,13 +54,13 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getAllFilms() {
         String query = BASE_FIND_QUERY + GROUP_BY_ID_CLAUSE;
-        return jdbcTemplate.query(query, new FilmMapper());
+        return jdbcTemplate.query(query, FilmMapper.INSTANCE);
     }
 
     @Override
     public Film findFilmById(int id) {
         String query = BASE_FIND_QUERY + WHERE_ID_CLAUSE + id + GROUP_BY_ID_CLAUSE;
-        List<Film> films = jdbcTemplate.query(query, new FilmMapper());
+        List<Film> films = jdbcTemplate.query(query, FilmMapper.INSTANCE);
         if (films.isEmpty()) {
             LOG.warn("Попытка  получить несуществующий фильм");
             throw new FilmNotFoundException();
@@ -138,23 +138,23 @@ public class FilmDbStorage implements FilmStorage {
         if ((genreId == null) && (year == null)) {
             query += GROUP_BY_ID_CLAUSE + ORDER_BY_COUNT_CLAUSE + " fetch first " + count + " rows only";
             LOG.info("Запрошен топ " + count + " популярных фильмов");
-            return jdbcTemplate.query(query, new FilmMapper());
+            return jdbcTemplate.query(query, FilmMapper.INSTANCE);
         }
         if (year == null) {
             query += GROUP_BY_ID_CLAUSE + HAVING_GENRES_IDS_LIKE + genreId + "%'" + ORDER_BY_COUNT_CLAUSE +
                     " fetch first " + count + " rows only";
             LOG.info("Запрошен топ " + count + " популярных фильмов с жанром id = " + genreId);
-            return jdbcTemplate.query(query, new FilmMapper());
+            return jdbcTemplate.query(query, FilmMapper.INSTANCE);
         }
         if (genreId == null) {
             query += WHERE_RELEASE_YEAR_CLAUSE + year + GROUP_BY_ID_CLAUSE;
             LOG.info("Запрошен топ " + count + " популярных фильмов " + year +  " года");
-            return jdbcTemplate.query(query, new FilmMapper());
+            return jdbcTemplate.query(query, FilmMapper.INSTANCE);
         }
         LOG.info("Запрошен топ " + count + " популярных фильмов " + year +  " года с жанром id = " + genreId);
         query += WHERE_RELEASE_YEAR_CLAUSE + year + GROUP_BY_ID_CLAUSE + HAVING_GENRES_IDS_LIKE + genreId + "%'" +
                 ORDER_BY_COUNT_CLAUSE + " fetch first " + count + " rows only";
-        return jdbcTemplate.query(query, new FilmMapper());
+        return jdbcTemplate.query(query, FilmMapper.INSTANCE);
     }
 
     @Override
@@ -177,7 +177,7 @@ public class FilmDbStorage implements FilmStorage {
                 " INNER JOIN (SELECT film_likes.film_id FROM film_likes WHERE user_id = ?) AS sf ON ff.film_id = sf.film_id)" +
                 " GROUP BY f.film_id" +
                 " ORDER BY COUNT(l.film_id) DESC";
-        return jdbcTemplate.query(query, new FilmMapper(), userId, friendId);
+        return jdbcTemplate.query(query, FilmMapper.INSTANCE, userId, friendId);
     }
 
     @Override
@@ -188,7 +188,7 @@ public class FilmDbStorage implements FilmStorage {
                 "WHERE user_id = ?) AND user_id IN (SELECT user_id  FROM film_likes WHERE film_id IN " +
                 "(SELECT film_id FROM film_likes WHERE user_id = ?) GROUP BY user_id ORDER BY COUNT (film_id) DESC " +
                 "))" + GROUP_BY_ID_CLAUSE;
-        return jdbcTemplate.query(query, new FilmMapper(), id, id);
+        return jdbcTemplate.query(query, FilmMapper.INSTANCE, id, id);
     }
         public void addFilmsDirector ( int filmId, int directorId){
             String sqlQuery = "insert into film_director (film_id,director_id) values (?,?)";
@@ -211,7 +211,7 @@ public class FilmDbStorage implements FilmStorage {
             query += ORDER_BY_COUNT_CLAUSE;
         }
 
-        List<Film> films = jdbcTemplate.query(query, new FilmMapper());
+        List<Film> films = jdbcTemplate.query(query, FilmMapper.INSTANCE);
         if (films.isEmpty()) {
             LOG.warn("Попытка  получить фильмы несуществующего режиссера");
             throw new NotFoundException();
@@ -234,7 +234,7 @@ public class FilmDbStorage implements FilmStorage {
             query += " or f.name ilike '%" + searchQuery + "%'";
         }
         query += GROUP_BY_ID_CLAUSE + ORDER_BY_YEAR_CLAUSE + " desc ";
-        return jdbcTemplate.query(query, new FilmMapper());
+        return jdbcTemplate.query(query, FilmMapper.INSTANCE);
     }
 
     @Override

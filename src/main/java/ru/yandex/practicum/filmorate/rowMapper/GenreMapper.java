@@ -7,9 +7,13 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-@Component
-public class GenreMapper implements RowMapper<Genre> {
 
+public enum GenreMapper implements RowMapper<Genre> {
+
+    INSTANCE;
+    public static GenreMapper getInstance() {
+        return INSTANCE;
+    }
     @Override
     public Genre mapRow(ResultSet resultSet, int rowNum) throws SQLException {
         return Genre.builder()
