@@ -1,13 +1,11 @@
 package ru.yandex.practicum.filmorate.storage.DAO;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.storage.ReviewStorageValidator;
 
 
 @Component
-@Qualifier("ReviewDbStorageValidator")
 public class ReviewDbStorageValidator implements ReviewStorageValidator {
 
     private final JdbcTemplate jdbcTemplate;

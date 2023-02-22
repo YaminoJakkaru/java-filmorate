@@ -46,13 +46,11 @@ public class Film {
     }
 
     public Map<String, Object> toMap() {
-        Map<String, Object> values = new HashMap<>();
-        values.put("name", name);
-        values.put("description", description);
-        values.put("release_date", releaseDate);
-        values.put("duration", duration);
-        values.put("mpa_id", mpa.getId());
-        return values;
+        return Map.of("name", name,
+                "description", description,
+                "release_date", releaseDate,
+                "duration", duration,
+                "mpa_id", mpa.getId());
     }
 
 

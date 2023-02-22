@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service.dbService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.enums.EntityType;
 import ru.yandex.practicum.filmorate.enums.EventType;
@@ -11,7 +10,6 @@ import ru.yandex.practicum.filmorate.enums.Operation;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.rowMapper.FilmMapper;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -33,10 +31,10 @@ public class FilmDbService implements FilmService {
     private static final Logger LOG = LoggerFactory.getLogger(FilmService.class);
 
     @Autowired
-    public FilmDbService(@Qualifier("FilmDbStorage") FilmStorage filmStorage,
-                         @Qualifier("EventDbStorage")EventStorage eventStorage,
-                         @Qualifier("UserDbStorageValidator") UserStorageValidator userStorageValidator,
-                         @Qualifier("FilmDbStorageValidator")FilmStorageValidator filmStorageValidator,
+    public FilmDbService(FilmStorage filmStorage,
+                         EventStorage eventStorage,
+                         UserStorageValidator userStorageValidator,
+                         FilmStorageValidator filmStorageValidator,
                          FilmValidator filmValidator) {
         this.filmStorage = filmStorage;
         this.eventStorage = eventStorage;

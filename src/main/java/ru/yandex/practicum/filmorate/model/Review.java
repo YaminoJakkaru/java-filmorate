@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Builder;
 import lombok.Data;
-import java.util.HashMap;
 import java.util.Map;
 
 @Data
@@ -17,12 +16,10 @@ public class Review {
     private int useful;
 
     public Map<String, Object> toMap() {
-        Map<String, Object> values = new HashMap<>();
-        values.put("content", content);
-        values.put("is_positive", isPositive);
-        values.put("user_id", userId);
-        values.put("film_id", filmId);
-        values.put("useful", useful);
-        return values;
+        return Map.of("content", content,
+                "is_positive", isPositive,
+                "user_id", userId,
+                "film_id", filmId,
+                "useful", useful);
     }
 }

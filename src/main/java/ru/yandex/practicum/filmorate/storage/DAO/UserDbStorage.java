@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage.DAO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
@@ -14,11 +13,10 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.util.List;
 
 @Component
-@Qualifier("UserDbStorage")
 public class UserDbStorage implements UserStorage {
     private static final Logger LOG = LoggerFactory.getLogger(UserStorage.class);
     private final JdbcTemplate jdbcTemplate;
-    SimpleJdbcInsert simpleJdbcInsertUser;
+    private final SimpleJdbcInsert simpleJdbcInsertUser;
     private static final String BASE_FIND_QUERY = "select u.*,group_concat(uf.friend_id) as friends "
             + "from users as u  left  join user_friend as uf on u.user_id=uf.user_id";
     private static final String GROUP_BY_ID_CLAUSE = " group by u.user_id ";
@@ -26,7 +24,7 @@ public class UserDbStorage implements UserStorage {
 
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        simpleJdbcInsertUser = new SimpleJdbcInsert(jdbcTemplate)
+        this.simpleJdbcInsertUser = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("user_id");
     }
@@ -76,7 +74,7 @@ public class UserDbStorage implements UserStorage {
             throw new UserNotFoundException();
         }
         LOG.info("Данные пользователя обновлен");
-        return findUserById(user.getId());
+        return user;
     }
 
     @Override

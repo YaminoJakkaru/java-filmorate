@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage.DAO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
@@ -14,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import java.util.List;
 
 @Component
-@Qualifier("DirectorDbStorage")
 public class DirectorDbStorage implements DirectorStorage {
     private static final Logger LOG = LoggerFactory.getLogger(DirectorStorage.class);
 
@@ -23,7 +21,7 @@ public class DirectorDbStorage implements DirectorStorage {
 
     public DirectorDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        simpleJdbcInsertDirector = new SimpleJdbcInsert(jdbcTemplate)
+        this.simpleJdbcInsertDirector = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("director")
                 .usingGeneratedKeyColumns("director_id");
     }
@@ -66,7 +64,7 @@ public class DirectorDbStorage implements DirectorStorage {
             throw new NotFoundException();
         }
         LOG.info("Данные режиссера обновлены");
-        return findDirectorById(director.getId());
+        return director;
     }
 
     @Override

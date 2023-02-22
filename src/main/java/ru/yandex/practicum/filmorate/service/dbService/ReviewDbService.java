@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service.dbService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.enums.EntityType;
 import ru.yandex.practicum.filmorate.enums.EventType;
@@ -32,10 +31,10 @@ public class ReviewDbService implements ReviewService {
     private static final Logger LOG = LoggerFactory.getLogger(ReviewService.class);
 
     @Autowired
-    public ReviewDbService(@Qualifier("ReviewDbStorage") ReviewStorage reviewStorage,
-                           @Qualifier("EventDbStorage")EventStorage eventStorage,
-                           @Qualifier("UserDbStorageValidator") UserStorageValidator userStorageValidator,
-                           @Qualifier("ReviewDbStorageValidator") ReviewStorageValidator reviewStorageValidator,
+    public ReviewDbService(ReviewStorage reviewStorage,
+                           EventStorage eventStorage,
+                           UserStorageValidator userStorageValidator,
+                           ReviewStorageValidator reviewStorageValidator,
                            ReviewValidator reviewValidator) {
         this.reviewStorage = reviewStorage;
         this.eventStorage = eventStorage;

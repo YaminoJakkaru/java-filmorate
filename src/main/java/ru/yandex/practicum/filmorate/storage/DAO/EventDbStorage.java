@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.DAO;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.enums.EntityType;
@@ -13,7 +12,6 @@ import ru.yandex.practicum.filmorate.storage.EventStorage;
 import java.util.List;
 
 @Component
-@Qualifier("EventDbStorage")
 public class EventDbStorage implements EventStorage {
 
     private final JdbcTemplate jdbcTemplate;

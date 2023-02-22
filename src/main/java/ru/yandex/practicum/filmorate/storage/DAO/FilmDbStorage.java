@@ -18,12 +18,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@Qualifier("FilmDbStorage")
 public class FilmDbStorage implements FilmStorage {
 
     private static final Logger LOG = LoggerFactory.getLogger(FilmStorage.class);
     private final JdbcTemplate jdbcTemplate;
-    SimpleJdbcInsert simpleJdbcInsertFilm;
+    private final SimpleJdbcInsert simpleJdbcInsertFilm;
     private static final String BASE_FIND_QUERY = "select f.*, m.name as mpa_name," +
             " (select group_concat(fg.genre_id) from film_genre as fg  where fg.film_id = f.film_id)  as genres_ids," +
             " (select group_concat(g.name) from film_genre as fg inner join genre as g on fg.genre_id=g.genre_id" +
@@ -41,14 +40,14 @@ public class FilmDbStorage implements FilmStorage {
     private static final String ORDER_BY_COUNT_CLAUSE = " order by count(fl.user_id) desc ";
     private static final String WHERE_DIRECTOR_ID_CLAUSE = " where d.director_id = ";
     private static final String ORDER_BY_YEAR_CLAUSE = " order by f.release_date ";
-    private static final String WHERE_FILM_NAME_CLAUSE = " where lower(f.name) like ";
-    private static final String WHERE_DIRECTOR_NAME_CLAUSE = " where lower(d.name) like ";
+    private static final String WHERE_FILM_NAME_CLAUSE = " where f.name ilike ";
+    private static final String WHERE_DIRECTOR_NAME_CLAUSE = " where d.name ilike ";
     private static final String HAVING_GENRES_IDS_LIKE = " having genres_ids like '%";
     private static final String WHERE_RELEASE_YEAR_CLAUSE = " where extract(year from f.release_date) = ";
 
     public FilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        simpleJdbcInsertFilm = new SimpleJdbcInsert(jdbcTemplate)
+        this.simpleJdbcInsertFilm = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("film")
                 .usingGeneratedKeyColumns("film_id");
     }
@@ -117,7 +116,7 @@ public class FilmDbStorage implements FilmStorage {
             throw new FilmNotFoundException();
         }
         LOG.info("Данные фильма изменены");
-        return findFilmById(film.getId());
+        return film;
     }
 
     @Override
@@ -138,13 +137,13 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> getTopFilms(int count, String genreId, String year) {
         String query = BASE_FIND_QUERY;
         if ((genreId == null) && (year == null)) {
-            query += GROUP_BY_ID_CLAUSE + ORDER_BY_COUNT_CLAUSE + " limit " + count;
+            query += GROUP_BY_ID_CLAUSE + ORDER_BY_COUNT_CLAUSE + " fetch first " + count + " rows only";
             LOG.info("Запрошен топ " + count + " популярных фильмов");
             return jdbcTemplate.query(query, new FilmMapper());
         }
         if (year == null) {
             query += GROUP_BY_ID_CLAUSE + HAVING_GENRES_IDS_LIKE + genreId + "%'" + ORDER_BY_COUNT_CLAUSE +
-                    " limit " + count;;
+                    " fetch first " + count + " rows only";
             LOG.info("Запрошен топ " + count + " популярных фильмов с жанром id = " + genreId);
             return jdbcTemplate.query(query, new FilmMapper());
         }
@@ -155,7 +154,7 @@ public class FilmDbStorage implements FilmStorage {
         }
         LOG.info("Запрошен топ " + count + " популярных фильмов " + year +  " года с жанром id = " + genreId);
         query += WHERE_RELEASE_YEAR_CLAUSE + year + GROUP_BY_ID_CLAUSE + HAVING_GENRES_IDS_LIKE + genreId + "%'" +
-                ORDER_BY_COUNT_CLAUSE + " limit " + count;
+                ORDER_BY_COUNT_CLAUSE + " fetch first " + count + " rows only";
         return jdbcTemplate.query(query, new FilmMapper());
     }
 
@@ -233,7 +232,7 @@ public class FilmDbStorage implements FilmStorage {
         if ("director,title".equals(searchSource) ||
                 "title,director".equals(searchSource)) {
             query += WHERE_DIRECTOR_NAME_CLAUSE + "'%" + searchQuery + "%'";
-            query += " or lower(f.name) like '%" + searchQuery + "%'";
+            query += " or f.name ilike '%" + searchQuery + "%'";
         }
         query += GROUP_BY_ID_CLAUSE + ORDER_BY_YEAR_CLAUSE + " desc ";
         return jdbcTemplate.query(query, new FilmMapper());

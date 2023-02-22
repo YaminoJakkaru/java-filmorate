@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage.DAO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
@@ -14,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 import java.util.List;
 
 @Component
-@Qualifier("ReviewDbStorage")
 public class ReviewDbStorage implements ReviewStorage {
 
     private static final String BASE_FIND_QUERY = "select r.*, " +
@@ -27,11 +25,11 @@ public class ReviewDbStorage implements ReviewStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    SimpleJdbcInsert simpleJdbcInsertReview;
+    private final SimpleJdbcInsert simpleJdbcInsertReview;
 
     public ReviewDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        simpleJdbcInsertReview = new SimpleJdbcInsert(jdbcTemplate)
+        this.simpleJdbcInsertReview = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("reviews")
                 .usingGeneratedKeyColumns("review_id");
     }
@@ -57,7 +55,7 @@ public class ReviewDbStorage implements ReviewStorage {
             throw new NotFoundException();
         }
         LOG.info("Данные отзыва изменены");
-        return findReviewById(review.getReviewId());
+        return review;
     }
 
     @Override
@@ -81,10 +79,10 @@ public class ReviewDbStorage implements ReviewStorage {
     public List<Review> getReviews(int filmId, int count) {
         if (filmId != 0) {
             String query = BASE_FIND_QUERY + "where film_id = ? group by r.review_id " +
-                           "order by useful DESC, review_id ASC limit ?";
+                           "order by useful DESC, review_id ASC fetch first ? rows only";
             return jdbcTemplate.query(query, new ReviewMapper(), filmId, count);
         }
-        String query = BASE_FIND_QUERY + " group by r.review_id order by useful DESC, review_id ASC limit ?";
+        String query = BASE_FIND_QUERY + " group by r.review_id order by useful DESC, review_id ASC fetch first ? rows only";
         return jdbcTemplate.query(query, new ReviewMapper(), count);
     }
 

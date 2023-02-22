@@ -3,9 +3,7 @@ package ru.yandex.practicum.filmorate.service.dbService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import ru.yandex.practicum.filmorate.enums.EntityType;
 import ru.yandex.practicum.filmorate.enums.EventType;
 import ru.yandex.practicum.filmorate.enums.Operation;
@@ -24,7 +22,6 @@ import ru.yandex.practicum.filmorate.storage.UserStorageValidator;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 public class UserDbService implements UserService {
@@ -41,10 +38,10 @@ public class UserDbService implements UserService {
     private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
-    public UserDbService(@Qualifier("UserDbStorage") UserStorage userStorage,
-                         @Qualifier("FilmDbStorage") FilmStorage filmStorage,
-                         @Qualifier("EventDbStorage") EventStorage eventStorage,
-                         @Qualifier("UserDbStorageValidator") UserStorageValidator userStorageValidator,
+    public UserDbService(UserStorage userStorage,
+                         FilmStorage filmStorage,
+                         EventStorage eventStorage,
+                         UserStorageValidator userStorageValidator,
                          UserValidator userValidator) {
         this.userStorage = userStorage;
         this.eventStorage = eventStorage;

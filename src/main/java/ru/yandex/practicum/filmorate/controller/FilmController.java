@@ -1,17 +1,12 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.service.dbService.FilmDbService;
 
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/films")
@@ -20,7 +15,7 @@ public class FilmController {
     private final FilmService filmService;
 
     @Autowired
-    public FilmController( FilmService filmService) {
+    public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
 
@@ -70,7 +65,7 @@ public class FilmController {
     @GetMapping("/search")
     public List<Film> getSearchedFilms(@RequestParam("query") String searchQuery,
                                        @RequestParam("by") String searchSource) {
-        return filmService.getSearchedFilms(searchQuery.toLowerCase(), searchSource);
+        return filmService.getSearchedFilms(searchQuery, searchSource);
     }
 
     @DeleteMapping("/{id}")

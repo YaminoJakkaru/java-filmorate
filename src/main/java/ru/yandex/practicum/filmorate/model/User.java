@@ -32,11 +32,9 @@ public class User {
     }
 
     public Map<String, Object> toMap() {
-        Map<String, Object> values = new HashMap<>();
-        values.put("email", email);
-        values.put("login",login);
-        values.put("name", name);
-        values.put("birthday", birthday);
-        return values;
+        return Map.of("email", email,
+                "login", login,
+                "name", name,
+                "birthday", birthday);
     }
 }
