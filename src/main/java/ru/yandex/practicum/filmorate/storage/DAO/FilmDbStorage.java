@@ -22,18 +22,21 @@ public class FilmDbStorage implements FilmStorage {
     private static final Logger LOG = LoggerFactory.getLogger(FilmStorage.class);
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsertFilm;
-    private static final String BASE_FIND_QUERY = "select f.*, m.name as mpa_name," +
-            " (select group_concat(fg.genre_id) from film_genre as fg  where fg.film_id = f.film_id)  as genres_ids," +
-            " (select group_concat(g.name) from film_genre as fg inner join genre as g on fg.genre_id=g.genre_id" +
-            " where fg.film_id = f.film_id) as genres_names," +
-            " group_concat(distinct fd.director_id)as directors_ids," +
-            " group_concat(distinct d.name) as directors_names," +
-            " group_concat(distinct fl.user_id) as likes" +
-            " from film as f" +
-            " left join mpa as m on f.mpa_id=m.mpa_id" +
-            " left join film_likes as fl on f.film_id=fl.film_id" +
-            " left join film_director as fd on f.film_id=fd.film_id" +
-            " left join director as d on fd.director_id=d.director_id";
+    private static final String BASE_FIND_QUERY =
+                " select f.*, " +
+                " m.name as mpa_name, " +
+                " group_concat(distinct fg.genre_id) as genres_ids, " +
+                " group_concat(distinct g.name order by g.genre_id) as genres_names, " +
+                " group_concat(distinct fd.director_id)as directors_ids, " +
+                " group_concat(distinct d.name order by d.director_id) as directors_names, " +
+                " group_concat(distinct fl.user_id) as likes " +
+                " from film as f " +
+                " join mpa as m on f.mpa_id = m.mpa_id " +
+                " left join film_genre as fg on f.film_id = fg.film_id " +
+                " left join genre as g on fg.genre_id = g.genre_id " +
+                " left join film_likes as fl on f.film_id = fl.film_id " +
+                " left join film_director as fd on f.film_id = fd.film_id " +
+                " left join director as d on fd.director_id = d.director_id ";
     private static final String GROUP_BY_ID_CLAUSE = " group by f.film_id ";
     private static final String WHERE_ID_CLAUSE = " where f.film_id= ";
     private static final String ORDER_BY_COUNT_CLAUSE = " order by count(fl.user_id) desc ";
@@ -172,11 +175,10 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getCommonFilms(int userId, int friendId) {
         String query = BASE_FIND_QUERY +
-                " LEFT JOIN film_likes l on f.film_id = l.film_id" +
-                " WHERE f.film_id IN (SELECT DISTINCT sf.film_id FROM (SELECT film_likes.film_id FROM film_likes WHERE user_id = ?) AS ff" +
-                " INNER JOIN (SELECT film_likes.film_id FROM film_likes WHERE user_id = ?) AS sf ON ff.film_id = sf.film_id)" +
+                " LEFT JOIN film_likes fl1 on f.film_id = fl1.film_id" +
+                " where fl.user_id=? and fl1.user_id=?"+
                 " GROUP BY f.film_id" +
-                " ORDER BY COUNT(l.film_id) DESC";
+                " ORDER BY COUNT(fl.film_id) DESC";
         return jdbcTemplate.query(query, FilmMapper.INSTANCE, userId, friendId);
     }
 
