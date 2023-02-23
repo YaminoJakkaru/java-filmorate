@@ -19,6 +19,7 @@ import ru.yandex.practicum.filmorate.storage.UserStorageValidator;
 import ru.yandex.practicum.filmorate.validator.ReviewValidator;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReviewDbService implements ReviewService {
@@ -80,7 +81,7 @@ public class ReviewDbService implements ReviewService {
         return reviewStorage.findReviewById(id);
     }
 
-    public List<Review> getReviews(int filmId, int count) {
+    public List<Review> getReviews(Optional<Integer> filmId, int count) {
         return reviewStorage.getReviews(filmId, count);
     }
 

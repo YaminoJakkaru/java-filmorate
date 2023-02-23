@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ReviewStorage {
 
@@ -14,7 +15,7 @@ public interface ReviewStorage {
 
     Review findReviewById(int id);
 
-    List<Review> getReviews(int filmId, int count);
+    List<Review> getReviews(Optional<Integer> filmId, int count);
 
     void addLike(int id, int userId);
 

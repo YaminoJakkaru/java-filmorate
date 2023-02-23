@@ -37,12 +37,13 @@ public class DirectorDbStorage implements DirectorStorage {
     @Override
     public Director findDirectorById(int id) {
         String query = "select * from director where director_id=" + id;
-        List<Director> director = jdbcTemplate.query(query, DirectorMapper.INSTANCE);
-        if (director.isEmpty()) {
-            LOG.warn("Попытка получить несуществующего режиссера");
-            throw new NotFoundException();
-        }
-        return director.get(0);
+        return jdbcTemplate.query(query, DirectorMapper.INSTANCE)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> {
+                    LOG.warn("Попытка получить несуществующего режиссера");
+                    return new NotFoundException();
+                });
     }
 
     @Override

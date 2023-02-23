@@ -7,10 +7,12 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.rowMapper.DirectorMapper;
 import ru.yandex.practicum.filmorate.rowMapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class ReviewDbStorage implements ReviewStorage {
@@ -39,7 +41,7 @@ public class ReviewDbStorage implements ReviewStorage {
         int reviewId = (int) simpleJdbcInsertReview.executeAndReturnKey(review.toMap());
         review.setReviewId(reviewId);
         LOG.info("Добавлен отзыв");
-        return findReviewById(reviewId);
+        return review;
     }
 
     @Override
@@ -67,23 +69,25 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public Review findReviewById(int id) {
         String query = BASE_FIND_QUERY + "where r.review_id = " + id + " group by r.review_id";
-        List<Review> reviews = jdbcTemplate.query(query, ReviewMapper.INSTANCE);
-        if (reviews.isEmpty()) {
-            LOG.warn("Попытка  получить несуществующий отзыв");
-            throw new NotFoundException();
-        }
-        return reviews.get(0);
+        return jdbcTemplate.query(query, ReviewMapper.INSTANCE)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> {
+                    LOG.warn("Попытка получить несуществующий отзыв");
+                    return new NotFoundException();
+                });
     }
 
     @Override
-    public List<Review> getReviews(int filmId, int count) {
-        if (filmId != 0) {
-            String query = BASE_FIND_QUERY + "where film_id = ? group by r.review_id " +
-                           "order by useful DESC, review_id ASC fetch first ? rows only";
-            return jdbcTemplate.query(query, ReviewMapper.INSTANCE, filmId, count);
+    public List<Review> getReviews(Optional<Integer> filmId, int count) {
+        if (filmId.isEmpty()) {
+            String query = BASE_FIND_QUERY + " group by r.review_id order by useful DESC, review_id ASC fetch first ? rows only";
+            return jdbcTemplate.query(query, ReviewMapper.INSTANCE, count);
         }
-        String query = BASE_FIND_QUERY + " group by r.review_id order by useful DESC, review_id ASC fetch first ? rows only";
-        return jdbcTemplate.query(query, ReviewMapper.INSTANCE, count);
+
+        String query = BASE_FIND_QUERY + "where film_id = ? group by r.review_id " +
+                "order by useful DESC, review_id ASC fetch first ? rows only";
+        return jdbcTemplate.query(query, ReviewMapper.INSTANCE, filmId.get(), count);
     }
 
     @Override
@@ -95,8 +99,8 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public void addDislike(int id, int userId) {
-        String query2 = "insert into review_dislike(review_id, user_id) values (?, ?)";
-        jdbcTemplate.update(query2, id, userId);
+        String query = "insert into review_dislike(review_id, user_id) values (?, ?)";
+        jdbcTemplate.update(query, id, userId);
         LOG.info("Поставлен дизлайк отзыву");
     }
 
