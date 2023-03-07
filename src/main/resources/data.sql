@@ -20,3 +20,4 @@ merge into mpa (mpa_id, name)
 values (4, 'R');
 merge into mpa (mpa_id, name)
 values (5, 'NC-17');
+

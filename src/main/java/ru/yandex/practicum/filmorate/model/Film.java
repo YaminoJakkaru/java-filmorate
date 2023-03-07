@@ -19,7 +19,7 @@ public class Film {
     private Mpa mpa;
     private final List<Genre> genres = new ArrayList<>();
     private final Set<Integer> likes = new HashSet<>();
-
+    private final List<Director> directors = new ArrayList<>();
 
     public void addLike(int id) {
         likes.add(id);
@@ -37,14 +37,20 @@ public class Film {
         genres.remove(genreId);
     }
 
+    public void addDirectors(Director director) {
+        directors.add(director);
+    }
+
+    public void deleteDirectors(int directorId) {
+        directors.remove(directorId);
+    }
+
     public Map<String, Object> toMap() {
-        Map<String, Object> values = new HashMap<>();
-        values.put("name", name);
-        values.put("description", description);
-        values.put("release_date", releaseDate);
-        values.put("duration", duration);
-        values.put("mpa_id", mpa.getId());
-        return values;
+        return Map.of("name", name,
+                "description", description,
+                "release_date", releaseDate,
+                "duration", duration,
+                "mpa_id", mpa.getId());
     }
 
 

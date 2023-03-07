@@ -1,11 +1,15 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
+
+import ru.yandex.practicum.filmorate.model.Film;
+
+import ru.yandex.practicum.filmorate.model.Event;
+
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.EventService;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.service.dbService.UserDbService;
 
 import java.util.List;
 
@@ -14,10 +18,13 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final EventService eventService;
 
     @Autowired
-    public UserController(@Qualifier("UserDbService") UserService userService) {
+    public UserController(UserService userService,
+                          EventService eventService) {
         this.userService = userService;
+        this.eventService = eventService;
     }
 
     @GetMapping
@@ -58,5 +65,20 @@ public class UserController {
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getMutualFriends(@PathVariable int id, @PathVariable int otherId) {
         return userService.getMutualFriends(id, otherId);
+    }
+
+    @GetMapping("/{id}/recommendations")
+    public List<Film> getRecommendFilms(@PathVariable int id) {
+        return userService.getRecommendFilms(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable int id) {
+        userService.deleteUser(id);
+    }
+
+    @GetMapping("/{id}/feed")
+    public List<Event> getFeed(@PathVariable int id){
+        return eventService.getFeed(id);
     }
 }
